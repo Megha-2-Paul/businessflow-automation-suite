@@ -144,6 +144,12 @@ else:
 st.divider()
 st.subheader("Continue working")
 nav_left, nav_middle, nav_right = st.columns(3)
-nav_left.page_link("ui/pages/data_workbench.py", label="Process spreadsheets", icon=":material/table_view:")
-nav_middle.page_link("ui/pages/invoices.py", label="Review invoices", icon=":material/receipt_long:")
-nav_right.page_link("ui/pages/inventory.py", label="Manage inventory", icon=":material/inventory_2:")
+nav_left.page_link(
+    "ui/pages/data_workbench.py", label="Process spreadsheets", icon=":material/table_view:"
+)
+nav_middle.page_link(
+    "ui/pages/invoices.py", label="Review invoices", icon=":material/receipt_long:"
+)
+nav_right.page_link(
+    "ui/pages/inventory.py", label="Manage inventory", icon=":material/inventory_2:"
+)
