@@ -1,5 +1,4 @@
 """Decision-focused dashboard metrics derived from saved workspace records."""
-from __future__ import annotations
 
 from calendar import month_abbr
 from datetime import date
