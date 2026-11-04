@@ -7,7 +7,6 @@ from config.settings import get_settings
 from reporting.dashboard import dashboard_insights
 from ui.workspace import get_database_url
 
-
 settings = get_settings()
 database_url = get_database_url(settings.database_url)
 demo_mode = st.session_state.get("bf_workspace_mode") == "Demo"
