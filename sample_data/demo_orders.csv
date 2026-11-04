@@ -1,0 +1,15 @@
+order_number,order_date,customer_name,customer_email,sku,product_name,quantity,unit_price,currency,status
+SAMPLE-ORD-4001,2026-10-02,Avery Bennett,avery@example.invalid,DEMO-1004,Wireless Headset,2,54.00,USD,Fulfilled
+SAMPLE-ORD-4002,2026-10-05,Jordan Ellis,jordan@example.invalid,DEMO-1005,USB-C Hub,1,38.50,USD,Confirmed
+SAMPLE-ORD-4003,2026-10-08,Morgan Reed,morgan@example.invalid,DEMO-1006,Portable SSD 1TB,1,96.00,USD,Processing
+SAMPLE-ORD-4004,2026-10-11,Taylor Brooks,taylor@example.invalid,DEMO-1007,Webcam 1080p,2,47.00,USD,Draft
+SAMPLE-ORD-4005,2026-10-14,Casey Morgan,casey@example.invalid,DEMO-1008,Mechanical Keyboard,1,82.00,USD,Confirmed
+SAMPLE-ORD-4006,2026-10-18,Riley Parker,riley@example.invalid,DEMO-1009,Laptop Sleeve,3,24.00,USD,Fulfilled
+SAMPLE-ORD-4007,2026-10-21,Cameron Hayes,cameron@example.invalid,DEMO-1010,Wireless Presenter,1,29.00,USD,Cancelled
+SAMPLE-ORD-4008,2026-10-24,Quinn Foster,quinn@example.invalid,DEMO-1011,Monitor Light Bar,2,61.00,USD,Processing
+SAMPLE-ORD-4009,2026-10-27,Drew Sullivan,drew@example.invalid,DEMO-1012,Desk Mat,2,18.00,USD,Confirmed
+SAMPLE-ORD-4010,2026-10-30,Jamie Collins,jamie@example.invalid,DEMO-1013,USB Microphone,1,73.00,USD,Fulfilled
+SAMPLE-ORD-4011,2026-11-01,Alex Rivera,alex@example.invalid,DEMO-1014,Ergonomic Mouse Pad,2,16.00,USD,Draft
+SAMPLE-ORD-4012,2026-11-02,Sam Bennett,sam@example.invalid,DEMO-1015,Laptop Riser,1,42.00,USD,Confirmed
+SAMPLE-ORD-4012,2026-11-02,Sam Bennett,sam@example.invalid,DEMO-1015,Laptop Riser,1,42.00,USD,Confirmed
+SAMPLE-ORD-4013,2026-11-03,Robin Murphy,,DEMO-1004,Wireless Headset,1,54.00,USD,Processing
