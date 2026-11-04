@@ -10,6 +10,7 @@ from reporting.service import processing_history
 from ui.workspace import get_database_url
 
 settings = get_settings()
+database_url = get_database_url(settings.database_url)
 st.title("Processing history")
 st.caption("Filter workflow runs, inspect recorded events and review errors.")
 with st.expander("Filters", expanded=True):
@@ -44,7 +45,7 @@ with st.expander("Filters", expanded=True):
     end_date = col4.date_input("Through", value=date.today(), disabled=not use_end)
 try:
     jobs = processing_history(
-        get_database_url(settings.database_url),
+        database_url,
         workflow=workflow,
         status=status,
         start_date=start_date if use_start else None,

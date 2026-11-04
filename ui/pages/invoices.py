@@ -15,6 +15,7 @@ from services.invoice_service import InvoiceSaveError, save_reviewed_invoice
 from ui.workspace import get_database_url
 
 settings = get_settings()
+database_url = get_database_url(settings.database_url)
 st.title("Invoice processing")
 st.caption(
     "Extract text from PDF invoices, review every field, then confirm what should be saved."
@@ -122,7 +123,7 @@ if draft:
         else:
             try:
                 invoice_id = save_reviewed_invoice(
-                    get_database_url(settings.database_url),
+                    database_url,
                     supplier=supplier,
                     invoice_number=invoice_number,
                     invoice_date=invoice_date,
@@ -142,7 +143,7 @@ if draft:
 
 st.divider()
 st.subheader("Saved invoices")
-factory = get_session_factory(get_database_url(settings.database_url))
+factory = get_session_factory(database_url)
 with factory() as session:
     statement = (
         select(Invoice)

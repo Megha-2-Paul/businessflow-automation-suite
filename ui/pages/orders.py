@@ -19,8 +19,9 @@ from services.order_service import (
 from ui.workspace import get_database_url
 
 settings = get_settings()
-factory = get_session_factory(get_database_url(settings.database_url))
-catalogue = list_products(get_database_url(settings.database_url), active_only=True)
+database_url = get_database_url(settings.database_url)
+factory = get_session_factory(database_url)
+catalogue = list_products(database_url, active_only=True)
 sku_to_id = {item.sku: item.id for item in catalogue}
 product_options = ["Non-stock", *sku_to_id]
 
@@ -63,7 +64,7 @@ with st.expander("Create an order", expanded=False):
     if submitted:
         try:
             new_id = create_order(
-                get_database_url(settings.database_url), order_number=number, customer_name=customer,
+                database_url, order_number=number, customer_name=customer,
                 customer_email=email, order_date=order_date, currency=currency,
                 line_items=resolve_product_lines(lines),
             )
@@ -140,7 +141,7 @@ if rows:
                 if edit:
                     try:
                         update_order(
-                            get_database_url(settings.database_url), order.id,
+                            database_url, order.id,
                             customer_name=edit_customer, customer_email=edit_email,
                             currency=edit_currency,
                             line_items=resolve_product_lines(edit_lines),
@@ -160,7 +161,7 @@ if rows:
                 next_status = st.selectbox("Change status to", allowed)
                 if st.button("Update order status"):
                     try:
-                        change_order_status(get_database_url(settings.database_url), order.id, next_status)
+                        change_order_status(database_url, order.id, next_status)
                         st.success(f"Order status changed to {next_status}.")
                         st.rerun()
                     except OrderServiceError as exc:

@@ -9,6 +9,7 @@ from reporting.service import REPORT_TYPES, report_data
 from ui.workspace import get_database_url
 
 settings = get_settings()
+database_url = get_database_url(settings.database_url)
 labels = {
     "orders": "Orders",
     "invoices": "Invoices",
@@ -39,7 +40,7 @@ else:
     )
 
 try:
-    frame = report_data(get_database_url(settings.database_url), report_type, start_date=start, end_date=end)
+    frame = report_data(database_url, report_type, start_date=start, end_date=end)
 except ValueError as exc:
     st.error(str(exc))
     st.stop()

@@ -9,17 +9,27 @@ from sqlalchemy import select
 
 from config.settings import PROJECT_ROOT
 from database.models import (
-    Business, Invoice, Order, OrderLineItem,
-    ProcessingJob, ProcessingLog, Product, StockMovement,
+    Business,
+    Invoice,
+    Order,
+    OrderLineItem,
+    ProcessingJob,
+    ProcessingLog,
+    Product,
+    StockMovement,
 )
 from database.session import get_session_factory, initialize_database
 
-DEMO_DATABASE_URL = f"sqlite:///{(PROJECT_ROOT / 'data' / 'businessflow-demo.db').as_posix()}"
+DEMO_DATABASE_URL = (
+    f"sqlite:///{(PROJECT_ROOT / 'data' / 'businessflow-demo.db').as_posix()}"
+)
 
 
 def get_database_url(default_url: str) -> str:
     """Return the database selected for the current Streamlit session."""
-    return DEMO_DATABASE_URL if st.session_state.get("bf_workspace_mode") == "Demo" else default_url
+    if st.session_state.get("bf_workspace_mode") == "Demo":
+        return DEMO_DATABASE_URL
+    return default_url
 
 
 def configure_workspace(default_url: str) -> str:
