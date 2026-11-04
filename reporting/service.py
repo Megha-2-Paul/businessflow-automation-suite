@@ -51,6 +51,13 @@ def dashboard_summary(database_url: str) -> dict[str, Any]:
             "order_statuses": [],
             "stock_levels": [],
             "currency_totals": [],
+            "orders_this_month": 0,
+            "fulfillment_rate": None,
+            "current_month_order_totals": [],
+            "monthly_order_trend": [],
+            "confirmed_vendor_payables": [],
+            "overdue_invoice_count": 0,
+            "overdue_vendor_payables": [],
         }
         if business_id is None:
             return empty
