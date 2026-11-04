@@ -18,8 +18,8 @@ from database.models import (
     Product,
     StockMovement,
 )
-from database.session import get_session_factory, initialize_database
 from database.demo_data import seed_demo_dataset
+from database.session import get_session_factory, initialize_database
 
 DEMO_DATABASE_URL = (
     f"sqlite:///{(PROJECT_ROOT / 'data' / 'businessflow-demo.db').as_posix()}"
