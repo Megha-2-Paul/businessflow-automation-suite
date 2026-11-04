@@ -19,6 +19,7 @@ from database.models import (
     StockMovement,
 )
 from database.session import get_session_factory, initialize_database
+from ui.demo_data import seed_demo_dataset
 
 DEMO_DATABASE_URL = (
     f"sqlite:///{(PROJECT_ROOT / 'data' / 'businessflow-demo.db').as_posix()}"
@@ -44,6 +45,7 @@ def configure_workspace(default_url: str) -> str:
     st.session_state["bf_workspace_mode"] = mode
     if mode == "Demo":
         initialize_demo_workspace()
+        seed_demo_dataset(DEMO_DATABASE_URL)
         st.sidebar.info("Demonstration data · isolated from live records")
         return DEMO_DATABASE_URL
     st.sidebar.caption("Live business data")
