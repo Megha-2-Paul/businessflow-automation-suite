@@ -79,13 +79,12 @@ def test_consolidation_requires_at_least_one_file():
 
 
 def test_validation_detects_missing_values_and_duplicates():
-    issues = validate_dataframe(pd.DataFrame({"sku": ["A", "A"], "qty": [1, None]}))
+    frame = pd.DataFrame({"sku": ["A", "A", "B"], "qty": [1, 1, None]})
+    issues = validate_dataframe(frame)
     assert {issue["issue_type"] for issue in issues} == {
         "missing_values",
         "duplicate_rows",
     }
-
-
 def test_exports_round_trip_and_neutralize_formula_values():
     frame = pd.DataFrame({"value": ["=1+1", "normal", "\tmalicious"]})
     csv_bytes = export_dataframe(frame, "csv")
