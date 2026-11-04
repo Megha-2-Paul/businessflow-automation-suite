@@ -1,8 +1,9 @@
 """Decision-focused dashboard metrics derived from saved workspace records."""
 
 from calendar import month_abbr
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from sqlalchemy import select
 
@@ -45,11 +46,6 @@ def dashboard_insights(database_url: str, *, today: date | None = None) -> dict:
     tracked. Monetary totals and average order value use the business currency;
     order counts include all currencies and are never summed as money.
     """
-    today = today or date.today()
-    month_start = today.replace(day=1)
-    previous_month_end = date.fromordinal(month_start.toordinal() - 1)
-    previous_month_start = previous_month_end.replace(day=1)
-
     with get_session_factory(database_url)() as session:
         business = session.scalar(select(Business).order_by(Business.id).limit(1))
         if business is None:
@@ -66,6 +62,17 @@ def dashboard_insights(database_url: str, *, today: date | None = None) -> dict:
         ).all()
         business_name = business.name
         currency = business.currency
+        business_timezone = business.timezone
+
+    if today is None:
+        try:
+            today = datetime.now(ZoneInfo(business_timezone)).date()
+        except ZoneInfoNotFoundError:
+            today = date.today()
+
+    month_start = today.replace(day=1)
+    previous_month_end = date.fromordinal(month_start.toordinal() - 1)
+    previous_month_start = previous_month_end.replace(day=1)
 
     active_orders = [order for order in orders if order.status in ACTIVE_ORDER_STATUSES]
     this_month = [
@@ -172,6 +179,7 @@ def dashboard_insights(database_url: str, *, today: date | None = None) -> dict:
     return {
         "business_name": business_name,
         "currency": currency,
+        "period_label": today.strftime("%B %Y"),
         "kpis": {
             "order_value": float(month_value),
             "order_value_change": float(month_value - previous_value),
