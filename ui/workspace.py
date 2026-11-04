@@ -45,6 +45,7 @@ def configure_workspace(default_url: str) -> str:
     st.session_state["bf_workspace_mode"] = mode
     if mode == "Demo":
         initialize_demo_workspace()
+        seed_demo_dataset(DEMO_DATABASE_URL)
         st.sidebar.info("Demonstration data · isolated from live records")
         return DEMO_DATABASE_URL
     st.sidebar.caption("Live business data")
@@ -132,5 +133,3 @@ def initialize_demo_workspace(database_url: str = DEMO_DATABASE_URL) -> None:
             job_id=job.id, level="INFO",
             message="Fictional demonstration invoice reviewed and saved.",
         ))
-
-    seed_demo_dataset(database_url)
