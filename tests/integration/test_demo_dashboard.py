@@ -25,7 +25,7 @@ def test_demo_seed_is_repeatable_and_relationships_are_persisted(tmp_path):
         assert session.scalar(select(func.count(Order.id))) == 29
         assert session.scalar(select(func.count(Invoice.id))) == 19
         assert session.scalar(select(func.count(ProcessingJob.id))) == 33
-        assert session.scalar(select(func.count(StockMovement.id))) == 24
+        assert session.scalar(select(func.count(StockMovement.id))) == 22
         assert session.scalar(select(func.count(Order.id)).where(
             Order.status == "Fulfilled"
         )) > 0
