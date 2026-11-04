@@ -158,7 +158,7 @@ def seed_demo_dataset(database_url: str) -> None:
                     currency=currency, subtotal=subtotal, tax=tax, total=total,
                     source_filename=f"fictional-invoice-{index + 1:02d}.pdf",
                     page_count=1, review_status="confirmed",
-                    created_at=datetime.combine(invoice_date, time(9), tzinfo=timezone.utc),
+                    created_at=datetime.combine(invoice_date, time(9), tzinfo=UTC),
                 )
                 session.add(invoice)
                 session.flush()
