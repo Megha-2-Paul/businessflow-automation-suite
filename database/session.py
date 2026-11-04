@@ -1,15 +1,15 @@
 """Database engine and session management."""
 from __future__ import annotations
 
+from collections.abc import Iterator
 from functools import lru_cache
 from pathlib import Path
-from typing import Iterator
 
 from sqlalchemy import Engine, create_engine, event
 from sqlalchemy.orm import Session, sessionmaker
 
-from database.base import Base
 from database import models  # noqa: F401 - register ORM models
+from database.base import Base
 
 
 def build_engine(database_url: str) -> Engine:
@@ -41,7 +41,9 @@ def get_engine(database_url: str) -> Engine:
 
 def get_session_factory(database_url: str) -> sessionmaker[Session]:
     """Create a session factory bound to the requested database."""
-    return sessionmaker(bind=get_engine(database_url), autoflush=False, expire_on_commit=False)
+    return sessionmaker(
+        bind=get_engine(database_url), autoflush=False, expire_on_commit=False
+    )
 
 
 def get_session(database_url: str) -> Iterator[Session]:

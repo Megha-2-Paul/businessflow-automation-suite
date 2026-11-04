@@ -23,7 +23,7 @@ class Settings:
     storage_dir: Path
 
     @classmethod
-    def from_environment(cls) -> "Settings":
+    def from_environment(cls) -> Settings:
         """Build settings from environment variables and the project .env file."""
         load_dotenv(PROJECT_ROOT / ".env")
         max_upload_mb = int(os.getenv("BUSINESSFLOW_MAX_UPLOAD_MB", "25"))

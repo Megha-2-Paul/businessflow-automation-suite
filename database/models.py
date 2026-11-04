@@ -3,7 +3,15 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import (
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database.base import Base
@@ -27,10 +35,16 @@ class Business(Base):
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     currency: Mapped[str] = mapped_column(String(3), nullable=False, default="USD")
     timezone: Mapped[str] = mapped_column(String(64), nullable=False, default="UTC")
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, nullable=False
+    )
 
-    dataset_sources: Mapped[list["DatasetSource"]] = relationship(back_populates="business")
-    processing_jobs: Mapped[list["ProcessingJob"]] = relationship(back_populates="business")
+    dataset_sources: Mapped[list[DatasetSource]] = relationship(
+        back_populates="business"
+    )
+    processing_jobs: Mapped[list[ProcessingJob]] = relationship(
+        back_populates="business"
+    )
 
 
 class DatasetSource(Base):
@@ -38,22 +52,35 @@ class DatasetSource(Base):
 
     __tablename__ = "dataset_sources"
     __table_args__ = (
-        UniqueConstraint("business_id", "source_name", "source_version", name="uq_dataset_source_version"),
+        UniqueConstraint(
+            "business_id",
+            "source_name",
+            "source_version",
+            name="uq_dataset_source_version",
+        ),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    business_id: Mapped[int] = mapped_column(ForeignKey("businesses.id", ondelete="CASCADE"), nullable=False)
+    business_id: Mapped[int] = mapped_column(
+        ForeignKey("businesses.id", ondelete="CASCADE"), nullable=False
+    )
     source_name: Mapped[str] = mapped_column(String(250), nullable=False)
     publisher: Mapped[str] = mapped_column(String(250), nullable=False)
     source_url: Mapped[str] = mapped_column(Text, nullable=False)
     license_name: Mapped[str] = mapped_column(String(120), nullable=False)
     attribution: Mapped[str | None] = mapped_column(Text)
-    source_version: Mapped[str] = mapped_column(String(100), nullable=False, default="unspecified")
+    source_version: Mapped[str] = mapped_column(
+        String(100), nullable=False, default="unspecified"
+    )
     checksum_sha256: Mapped[str | None] = mapped_column(String(64))
-    imported_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    imported_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, nullable=False
+    )
 
     business: Mapped[Business] = relationship(back_populates="dataset_sources")
-    imports: Mapped[list["DatasetImport"]] = relationship(back_populates="dataset_source")
+    imports: Mapped[list[DatasetImport]] = relationship(
+        back_populates="dataset_source"
+    )
 
 
 class DatasetImport(Base):
@@ -62,13 +89,19 @@ class DatasetImport(Base):
     __tablename__ = "dataset_imports"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    dataset_source_id: Mapped[int] = mapped_column(ForeignKey("dataset_sources.id", ondelete="CASCADE"), nullable=False)
+    dataset_source_id: Mapped[int] = mapped_column(
+        ForeignKey("dataset_sources.id", ondelete="CASCADE"), nullable=False
+    )
     filename: Mapped[str] = mapped_column(String(255), nullable=False)
     checksum_sha256: Mapped[str | None] = mapped_column(String(64))
-    downloaded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    downloaded_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, nullable=False
+    )
     row_count: Mapped[int | None] = mapped_column(Integer)
 
-    dataset_source: Mapped[DatasetSource] = relationship(back_populates="imports")
+    dataset_source: Mapped[DatasetSource] = relationship(
+        back_populates="imports"
+    )
 
 
 class ProcessingJob(Base):
@@ -83,7 +116,9 @@ class ProcessingJob(Base):
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    business_id: Mapped[int] = mapped_column(ForeignKey("businesses.id", ondelete="CASCADE"), nullable=False)
+    business_id: Mapped[int] = mapped_column(
+        ForeignKey("businesses.id", ondelete="CASCADE"), nullable=False
+    )
     job_type: Mapped[str] = mapped_column(String(80), nullable=False)
     status: Mapped[str] = mapped_column(String(30), nullable=False, default="pending")
     records_processed: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
@@ -91,11 +126,17 @@ class ProcessingJob(Base):
     records_failed: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, nullable=False
+    )
 
     business: Mapped[Business] = relationship(back_populates="processing_jobs")
-    logs: Mapped[list["ProcessingLog"]] = relationship(back_populates="job", cascade="all, delete-orphan")
-    errors: Mapped[list["ProcessingError"]] = relationship(back_populates="job", cascade="all, delete-orphan")
+    logs: Mapped[list[ProcessingLog]] = relationship(
+        back_populates="job", cascade="all, delete-orphan"
+    )
+    errors: Mapped[list[ProcessingError]] = relationship(
+        back_populates="job", cascade="all, delete-orphan"
+    )
 
 
 class ProcessingLog(Base):
@@ -103,14 +144,21 @@ class ProcessingLog(Base):
 
     __tablename__ = "processing_logs"
     __table_args__ = (
-        CheckConstraint("level IN ('DEBUG', 'INFO', 'WARNING', 'ERROR')", name="ck_processing_log_level"),
+        CheckConstraint(
+            "level IN ('DEBUG', 'INFO', 'WARNING', 'ERROR')",
+            name="ck_processing_log_level",
+        ),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    job_id: Mapped[int] = mapped_column(ForeignKey("processing_jobs.id", ondelete="CASCADE"), nullable=False)
+    job_id: Mapped[int] = mapped_column(
+        ForeignKey("processing_jobs.id", ondelete="CASCADE"), nullable=False
+    )
     level: Mapped[str] = mapped_column(String(10), nullable=False, default="INFO")
     message: Mapped[str] = mapped_column(Text, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, nullable=False
+    )
 
     job: Mapped[ProcessingJob] = relationship(back_populates="logs")
 
@@ -121,10 +169,14 @@ class ProcessingError(Base):
     __tablename__ = "processing_errors"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    job_id: Mapped[int] = mapped_column(ForeignKey("processing_jobs.id", ondelete="CASCADE"), nullable=False)
+    job_id: Mapped[int] = mapped_column(
+        ForeignKey("processing_jobs.id", ondelete="CASCADE"), nullable=False
+    )
     row_number: Mapped[int | None] = mapped_column(Integer)
     issue_type: Mapped[str] = mapped_column(String(100), nullable=False)
     details: Mapped[str] = mapped_column(Text, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, nullable=False
+    )
 
     job: Mapped[ProcessingJob] = relationship(back_populates="errors")
