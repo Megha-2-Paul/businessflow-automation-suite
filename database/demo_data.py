@@ -1,7 +1,7 @@
 """Deterministic fictional records for a useful, repeatable demo workspace."""
 from __future__ import annotations
 
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
 
 from sqlalchemy import select
@@ -52,7 +52,7 @@ def seed_demo_dataset(database_url: str) -> None:
             return
 
         today = date.today()
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         products = []
         for sku, name, stock, reorder, price in PRODUCTS:
             product = Product(
