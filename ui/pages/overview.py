@@ -37,7 +37,7 @@ else:
 
 st.subheader("This month's performance")
 st.caption(
-    f"Order activity for {pd.Timestamp.today():%B %Y}. "
+    f"Order activity for {data.get('period_label', 'the current month')}. "
     f"Order values and average order value are shown in {currency}; "
     "these figures are not collected revenue."
 )
