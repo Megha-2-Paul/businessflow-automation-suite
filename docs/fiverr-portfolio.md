@@ -13,7 +13,8 @@ reporting and processing history into one local workspace.
 - Selectable-text PDF invoice extraction with human review before saving.
 - Customer order creation, editing and controlled status transitions.
 - Product catalogue, stock movement ledger and physical stocktake reconciliation.
-- Database-backed dashboard, downloadable reports and processing history.
+- Database-backed dashboard with monthly order-value trends, currency-specific order values, fulfilment rate, supplier invoice liabilities, overdue invoice alerts and reorder attention.
+- Downloadable reports and processing history.
 - Separate fictional Demo workspace for safe product walkthroughs.
 
 ## Suggested demonstration sequence
@@ -71,6 +72,8 @@ contains seeded example records.
 ## Visual capture guidance
 
 Use the Business overview in Demo workspace as the primary portfolio image.
+The dashboard calculates these indicators from saved workspace records. The Demo workspace uses fictional, versioned sample records; the Live workspace reads the selected business database. Order value is not collected revenue because payment tracking is not currently implemented.
+
 Capture the running application at a desktop viewport (ideally 16:9, around
 1440 × 900 pixels) with the sidebar visible, browser zoom at 100%, and no
 developer tools, notifications or personal browser information in view. Keep
