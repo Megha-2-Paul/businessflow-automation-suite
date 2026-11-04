@@ -4,6 +4,7 @@ from datetime import date
 import streamlit as st
 
 from config.settings import get_settings
+from ui.workspace import get_database_url
 from reporting.exports import export_csv, export_xlsx
 from reporting.service import REPORT_TYPES, report_data
 
@@ -38,7 +39,7 @@ else:
     )
 
 try:
-    frame = report_data(settings.database_url, report_type, start_date=start, end_date=end)
+    frame = report_data(get_database_url(settings.database_url), report_type, start_date=start, end_date=end)
 except ValueError as exc:
     st.error(str(exc))
     st.stop()

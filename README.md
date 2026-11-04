@@ -41,6 +41,16 @@ and a transactional SQLAlchemy persistence layer.
 - Filter processing history by workflow, status and date; inspect logs and errors.
 - Download filtered processing history as CSV.
 
+## Demonstration workspace
+
+The sidebar includes a separate Demo workspace backed by
+`data/businessflow-demo.db`. The first selection creates clearly fictional
+sample products, stock balances, an order, an invoice and processing activity.
+The demo database is separate from the configured live database; switching
+workspaces changes which database the UI reads and writes. Demo records are
+local examples, not customer results. Remove the demo database file to reset
+the demonstration dataset; it will be recreated on the next selection.
+
 ## Technology
 
 Python 3.11+, Streamlit, Pandas, NumPy, OpenPyXL, SQLAlchemy, Pydantic, Plotly,

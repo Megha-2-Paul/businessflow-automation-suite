@@ -8,6 +8,7 @@ import streamlit as st
 from sqlalchemy import select
 
 from config.settings import get_settings
+from ui.workspace import get_database_url
 from database.models import Business, Invoice
 from database.session import get_session_factory
 from invoices.extraction import InvoiceExtractionError, extract_invoice_pdf
@@ -121,7 +122,7 @@ if draft:
         else:
             try:
                 invoice_id = save_reviewed_invoice(
-                    settings.database_url,
+                    get_database_url(settings.database_url),
                     supplier=supplier,
                     invoice_number=invoice_number,
                     invoice_date=invoice_date,
@@ -141,7 +142,7 @@ if draft:
 
 st.divider()
 st.subheader("Saved invoices")
-factory = get_session_factory(settings.database_url)
+factory = get_session_factory(get_database_url(settings.database_url))
 with factory() as session:
     statement = (
         select(Invoice)

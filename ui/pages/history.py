@@ -5,6 +5,7 @@ import pandas as pd
 import streamlit as st
 
 from config.settings import get_settings
+from ui.workspace import get_database_url
 from reporting.exports import export_csv
 from reporting.service import processing_history
 
@@ -43,7 +44,7 @@ with st.expander("Filters", expanded=True):
     end_date = col4.date_input("Through", value=date.today(), disabled=not use_end)
 try:
     jobs = processing_history(
-        settings.database_url,
+        get_database_url(settings.database_url),
         workflow=workflow,
         status=status,
         start_date=start_date if use_start else None,

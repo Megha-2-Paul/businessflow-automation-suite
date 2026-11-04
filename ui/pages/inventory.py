@@ -3,6 +3,7 @@ import streamlit as st
 from sqlalchemy import select
 
 from config.settings import get_settings
+from ui.workspace import get_database_url
 from database.models import InventoryCount, InventoryCountLine
 from database.session import get_session_factory
 from services.inventory_service import (
@@ -17,11 +18,11 @@ from services.inventory_service import (
 )
 
 settings = get_settings()
-factory = get_session_factory(settings.database_url)
+factory = get_session_factory(get_database_url(settings.database_url))
 st.title("Inventory management")
 st.caption("Maintain your product catalogue, record stock movements and reconcile physical counts.")
 
-products = list_products(settings.database_url)
+products = list_products(get_database_url(settings.database_url))
 active_products = [item for item in products if item.is_active]
 low_stock = [item for item in active_products if item.stock_on_hand <= item.reorder_level]
 col1, col2, col3 = st.columns(3)
@@ -48,7 +49,7 @@ with tab_products:
         if add_product:
             try:
                 create_product(
-                    settings.database_url, sku=sku, name=name, unit=unit,
+                    get_database_url(settings.database_url), sku=sku, name=name, unit=unit,
                     reorder_level=reorder, opening_stock=opening,
                 )
                 st.success("Product added.")
@@ -79,7 +80,7 @@ with tab_products:
         if save_product:
             try:
                 update_product(
-                    settings.database_url, selected.id, name=edit_name, unit=edit_unit,
+                    get_database_url(settings.database_url), selected.id, name=edit_name, unit=edit_unit,
                     reorder_level=edit_reorder, is_active=edit_active,
                 )
                 st.success("Product updated.")
@@ -111,7 +112,7 @@ with tab_products:
         if save_movement:
             try:
                 adjust_stock(
-                    settings.database_url, movement_product.id,
+                    get_database_url(settings.database_url), movement_product.id,
                     movement_type=movement_type, quantity=movement_quantity,
                     reference=reference, notes=notes,
                 )
@@ -121,7 +122,7 @@ with tab_products:
                 st.error(str(exc))
 
 with tab_movements:
-    movements = list_movements(settings.database_url)
+    movements = list_movements(get_database_url(settings.database_url))
     if movements:
         st.dataframe(
             [{
@@ -152,7 +153,7 @@ with tab_stocktake:
         if save_count:
             try:
                 count_id = create_stocktake(
-                    settings.database_url, counts=count_rows, notes=count_notes
+                    get_database_url(settings.database_url), counts=count_rows, notes=count_notes
                 )
                 st.success(f"Stocktake #{count_id} saved. Review its variances below.")
                 st.rerun()
@@ -185,7 +186,7 @@ with tab_stocktake:
             )
             if st.button("Apply stocktake adjustments", disabled=not confirmed):
                 try:
-                    reconcile_stocktake(settings.database_url, count.id)
+                    reconcile_stocktake(get_database_url(settings.database_url), count.id)
                     st.success("Stocktake reconciled and ledger updated.")
                     st.rerun()
                 except InventoryServiceError as exc:

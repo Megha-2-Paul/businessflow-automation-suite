@@ -6,6 +6,7 @@ import re
 import streamlit as st
 
 from config.settings import get_settings
+from ui.workspace import get_database_url
 from processing.cleaning import clean_dataframe, consolidate_dataframes
 from processing.spreadsheets import (
     SpreadsheetError,
@@ -99,7 +100,7 @@ with clean_tab:
             st.session_state["bf_clean_summary"] = changes
             st.session_state["bf_clean_issues"] = cleaned_issues
             job_id = record_processing_result(
-                settings.database_url,
+                get_database_url(settings.database_url),
                 job_type="spreadsheet_clean",
                 records_processed=len(source_frame),
                 records_succeeded=len(cleaned),
@@ -163,7 +164,7 @@ with combine_tab:
             st.session_state["bf_combined_frame"] = combined
             st.session_state["bf_combined_summary"] = summary
             job_id = record_processing_result(
-                settings.database_url,
+                get_database_url(settings.database_url),
                 job_type="spreadsheet_consolidation",
                 records_processed=sum(len(frame) for frame in frames),
                 records_succeeded=len(combined),
