@@ -105,8 +105,14 @@ def test_exports_are_readable_and_formula_text_is_neutralised(tmp_path):
     url = populated_database(tmp_path)
     frame = report_data(url, "orders")
     frame.loc[0, "Customer"] = "=HYPERLINK(\"https://example.invalid\")"
+    frame.loc[0, "Formula edge cases"] = "\t=1+1"
+    frame.loc[0, "Carriage return"] = "\r=2+2"
+    frame.loc[0, "Line feed"] = "\n=3+3"
     csv_data = export_csv(frame)
     assert b"'=HYPERLINK" in csv_data
+    assert b"'\t=1+1" in csv_data
+    assert b"'\r=2+2" in csv_data
+    assert b"'\n=3+3" in csv_data
     workbook = pd.ExcelFile(BytesIO(export_xlsx(frame)))
     assert workbook.sheet_names == ["Report"]
     with pytest.raises(ValueError, match="Start date"):

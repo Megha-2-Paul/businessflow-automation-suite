@@ -13,6 +13,7 @@ settings = get_settings()
 demo_mode = st.session_state.get("bf_workspace_mode") == "Demo"
 summary = dashboard_summary(get_database_url(settings.database_url))
 
+st.markdown('<div class="bf-page-eyebrow">BUSINESS OPERATIONS</div>', unsafe_allow_html=True)
 st.title("Business overview")
 st.caption(
     f"Operational snapshot · {summary['business_name']} · "

@@ -13,7 +13,8 @@ def _safe_frame(frame: pd.DataFrame) -> pd.DataFrame:
         safe[column] = safe[column].map(
             lambda value: (
                 "'" + value
-                if isinstance(value, str) and value.startswith(("=", "+", "-", "@"))
+                if isinstance(value, str)
+                and value.startswith(("=", "+", "-", "@", chr(9), chr(10), chr(13)))
                 else value
             )
         )
