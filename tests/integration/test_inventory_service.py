@@ -10,6 +10,7 @@ from services.inventory_service import (
     adjust_stock,
     create_product,
     create_stocktake,
+    list_movements,
     reconcile_stocktake,
 )
 from services.order_service import (
@@ -124,3 +125,22 @@ def test_insufficient_stock_rolls_back_order_fulfilment(tmp_path):
         assert session.get(Order, order_id).status == "Processing"
         assert session.get(Product, product_id).stock_on_hand == Decimal("1.000")
         assert session.query(StockMovement).filter_by(order_id=order_id).count() == 0
+
+
+
+def test_list_movements_keeps_product_details_available_after_session_closes(tmp_path):
+    url = f"sqlite:///{tmp_path / 'movement-list.db'}"
+    product_id = create_product(
+        url, sku="LIST-1", name="Desk lamp", opening_stock="4"
+    )
+    adjust_stock(
+        url, product_id, movement_type="receipt", quantity="2",
+        reference="PO-100",
+    )
+
+    movements = list_movements(url)
+
+    assert len(movements) == 2
+    assert movements[0].product.sku == "LIST-1"
+    assert movements[0].product.name == "Desk lamp"
+    assert movements[0].reference == "PO-100"
