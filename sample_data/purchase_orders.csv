@@ -1,0 +1,11 @@
+po_number,supplier,po_date,sku,product,quantity,unit_cost,currency
+PO-501,Apex Office Supply,2026-10-01,DEMO-SKU-01,Wireless Mouse,20,14.50,USD
+PO-502,Greenline Wholesale,2026-10-03,DEMO-SKU-02,USB-C Keyboard,15,28.00,USD
+PO-503,Metro Tech Trading,2026-10-06,DEMO-SKU-03,Laptop Stand,12,19.25,USD
+PO-504,Apex Office Supply,2026-10-10,DEMO-SKU-04,HD Webcam,10,35.00,USD
+PO-505,Greenline Wholesale,2026-10-13,DEMO-SKU-05,USB-C Hub,18,16.75,USD
+PO-506,Metro Tech Trading,2026-10-16,DEMO-SKU-06,Desk Lamp,8,12.00,USD
+PO-507,Apex Office Supply,2026-10-19,DEMO-SKU-07,Monitor Riser,9,22.00,USD
+PO-508,Greenline Wholesale,2026-10-23,DEMO-SKU-08,Notebook Set,40,6.25,USD
+PO-509,Metro Tech Trading,2026-10-26,DEMO-SKU-09,Bluetooth Headset,7,43.00,USD
+PO-510,Apex Office Supply,2026-10-30,DEMO-SKU-10,Portable SSD,6,58.00,USD
