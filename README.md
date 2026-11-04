@@ -44,12 +44,16 @@ and a transactional SQLAlchemy persistence layer.
 ## Demonstration workspace
 
 The sidebar includes a separate Demo workspace backed by
-`data/businessflow-demo.db`. The first selection creates clearly fictional
-sample products, stock balances, an order, an invoice and processing activity.
-The demo database is separate from the configured live database; switching
-workspaces changes which database the UI reads and writes. Demo records are
-local examples, not customer results. Remove the demo database file to reset
-the demonstration dataset; it will be recreated on the next selection.
+`data/businessflow-demo.db`. It is populated with deterministic fictional
+products, stock balances and movements, customer orders, reviewed invoices,
+and processing history. The seeder is repeatable and adds its sample records
+only once; it preserves existing demo records. The demo database is separate
+from the configured live database. Dashboard KPIs and charts are calculated
+from the selected database: order volume, fulfilment rate, order value grouped
+by currency, average order value, confirmed invoice totals, and inventory
+risk. Order values are not cash receipts, and confirmed invoice values are not
+payment or outstanding balances. Demo records are local examples, not customer
+results. Remove the demo database file to reset the demonstration workspace.
 
 ## Technology
 
@@ -70,11 +74,14 @@ Run checks with pytest, ruff check . and the compile command in docs/setup.md.
 ## Configuration and data
 
 See .env.example. Upload size is controlled by BUSINESSFLOW_MAX_UPLOAD_MB.
-Do not commit .env, local databases, uploads or private business data.
+Sample Data Workbench files are in `sample_data/` and are fictional; the raw
+orders file intentionally includes whitespace, a duplicate and a missing
+quantity for validation demonstrations. Do not commit .env, local databases,
+uploads or private business data.
 
-No customer records, synthetic stock balances or fabricated business outcomes
-are bundled. Inventory starts at zero unless a user enters a real opening
-balance. Dashboard figures and reports are computed from saved workspace data.
+The isolated Demo workspace uses fictional synthetic records for walkthroughs.
+Live workspace records are not seeded. Dashboard figures and reports are
+computed from saved workspace data.
 Public datasets may be downloaded separately after reviewing licence,
 attribution and privacy conditions. See data/README.md.
 
