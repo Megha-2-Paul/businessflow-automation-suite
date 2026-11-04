@@ -9,12 +9,19 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
 from database.models import (
-    Business, InventoryCount, InventoryCountLine, Product, ProcessingJob,
-    ProcessingLog, StockMovement,
+    Business,
+    InventoryCount,
+    InventoryCountLine,
+    ProcessingJob,
+    ProcessingLog,
+    Product,
+    StockMovement,
 )
 from database.session import get_session_factory, initialize_database
 from inventory.validation import (
-    InventoryValidationError, nonnegative_quantity, positive_quantity,
+    InventoryValidationError,
+    nonnegative_quantity,
+    positive_quantity,
 )
 
 
@@ -77,7 +84,9 @@ def create_product(
             _activity(session, business_id, f"Product {sku_value} created.")
             return product.id
     except IntegrityError as exc:
-        raise InventoryServiceError("A product with this SKU already exists in this workspace.") from exc
+        raise InventoryServiceError(
+            "A product with this SKU already exists in this workspace."
+        ) from exc
 
 
 def update_product(
@@ -119,8 +128,9 @@ def adjust_stock(
             raise InventoryServiceError("Product was not found.")
         if not product.is_active:
             raise InventoryServiceError("Inactive products cannot receive stock movements.")
-        delta = amount if movement_type == "receipt" else -amount if movement_type == "issue" else amount
-        if movement_type == "adjustment":
+        if movement_type == "issue":
+            delta = -amount
+        else:
             delta = amount
         new_balance = product.stock_on_hand + delta
         if new_balance < 0:
@@ -131,7 +141,10 @@ def adjust_stock(
             quantity_delta=delta, quantity_after=new_balance,
             reference=reference.strip()[:120] or None, notes=notes.strip() or None,
         ))
-        _activity(session, product.business_id, f"Stock {movement_type} recorded for {product.sku}.")
+        _activity(
+            session, product.business_id,
+            f"Stock {movement_type} recorded for {product.sku}.",
+        )
 
 
 def create_stocktake(database_url: str, *, counts: list[dict[str, Any]], notes: str = "") -> int:
@@ -146,7 +159,10 @@ def create_stocktake(database_url: str, *, counts: list[dict[str, Any]], notes: 
             if product_id in seen:
                 raise InventoryServiceError("A product can appear only once in a stocktake.")
             seen.add(product_id)
-            normalized.append((product_id, nonnegative_quantity(row["counted_quantity"], "Counted quantity")))
+            counted = nonnegative_quantity(
+                row["counted_quantity"], "Counted quantity"
+            )
+            normalized.append((product_id, counted))
     except (KeyError, TypeError, ValueError, InventoryValidationError) as exc:
         if isinstance(exc, InventoryServiceError):
             raise
