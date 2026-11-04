@@ -34,3 +34,8 @@ def configure_workspace(default_url: str) -> str:
         return DEMO_DATABASE_URL
     st.sidebar.caption("Live business data")
     return default_url
+
+
+def initialize_demo_workspace(database_url: str = DEMO_DATABASE_URL) -> None:
+    """Compatibility entry point for tests and scripts that seed demo records."""
+    seed_demo_data(database_url)
