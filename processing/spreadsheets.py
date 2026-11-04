@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from io import BytesIO
 from pathlib import PurePath
-from zipfile import BadZipFile, is_zipfile
+from zipfile import BadZipFile, ZipFile, is_zipfile
 
 import pandas as pd
 from pandas.errors import EmptyDataError, ParserError
@@ -11,6 +11,9 @@ from pandas.errors import EmptyDataError, ParserError
 SUPPORTED_EXTENSIONS = {".csv", ".xlsx"}
 MAX_ROWS = 250_000
 MAX_COLUMNS = 200
+MAX_XLSX_ENTRIES = 10_000
+MAX_XLSX_UNCOMPRESSED_BYTES = 250 * 1024 * 1024
+REQUIRED_XLSX_PARTS = {'[Content_Types].xml', 'xl/workbook.xml'}
 
 
 class SpreadsheetError(ValueError):
@@ -27,9 +30,29 @@ def _validate_upload(filename: str, content: bytes, max_size_bytes: int) -> str:
         raise SpreadsheetError(
             f"File exceeds the configured limit of {max_size_bytes // (1024 * 1024)} MB."
         )
-    if extension == ".xlsx" and not is_zipfile(BytesIO(content)):
-        raise SpreadsheetError("The XLSX file is not a valid workbook.")
+    if max_size_bytes <= 0:
+        raise SpreadsheetError("The configured upload limit must be positive.")
+    if extension == ".xlsx":
+        _validate_xlsx_archive(content)
     return extension
+
+
+def _validate_xlsx_archive(content: bytes) -> None:
+    """Reject malformed or unusually large ZIP containers before parsing XLSX."""
+    if not is_zipfile(BytesIO(content)):
+        raise SpreadsheetError("The XLSX file is not a valid workbook.")
+    try:
+        with ZipFile(BytesIO(content)) as archive:
+            entries = archive.infolist()
+            if len(entries) > MAX_XLSX_ENTRIES:
+                raise SpreadsheetError("The Excel workbook contains too many archive entries.")
+            if sum(item.file_size for item in entries) > MAX_XLSX_UNCOMPRESSED_BYTES:
+                raise SpreadsheetError("The Excel workbook expands beyond the safe size limit.")
+            names = {item.filename for item in entries}
+            if not REQUIRED_XLSX_PARTS.issubset(names):
+                raise SpreadsheetError("The XLSX file is missing required workbook content.")
+    except (BadZipFile, OSError) as exc:
+        raise SpreadsheetError("The XLSX file is not a valid workbook.") from exc
 
 
 def list_excel_sheets(filename: str, content: bytes, max_size_bytes: int) -> list[str]:

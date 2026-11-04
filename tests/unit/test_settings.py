@@ -14,9 +14,28 @@ def test_settings_defaults(monkeypatch, tmp_path):
     assert settings.database_url.startswith("sqlite:///")
 
 
-def test_settings_reject_invalid_upload_limit(monkeypatch):
-    monkeypatch.setenv("BUSINESSFLOW_MAX_UPLOAD_MB", "0")
-    with pytest.raises(ValueError, match="between 1 and 500"):
+@pytest.mark.parametrize("value", ["0", "501", "not-a-number", "1.5"])
+def test_settings_reject_invalid_upload_limit(monkeypatch, value):
+    monkeypatch.setenv("BUSINESSFLOW_MAX_UPLOAD_MB", value)
+    with pytest.raises(ValueError, match="BUSINESSFLOW_MAX_UPLOAD_MB"):
+        Settings.from_environment()
+
+
+@pytest.mark.parametrize("value", ["", "not-a-url", "mysql://user:pass@host/db"])
+def test_settings_reject_invalid_database_url(monkeypatch, value):
+    monkeypatch.setenv("BUSINESSFLOW_DATABASE_URL", value)
+    with pytest.raises(ValueError, match="BUSINESSFLOW_DATABASE_URL"):
+        Settings.from_environment()
+
+
+def test_settings_accepts_postgresql_driver_url(monkeypatch):
+    monkeypatch.setenv("BUSINESSFLOW_DATABASE_URL", "postgresql+psycopg://user:secret@localhost:5432/businessflow")
+    assert Settings.from_environment().database_url.startswith("postgresql+psycopg://")
+
+
+def test_settings_reject_invalid_log_level(monkeypatch):
+    monkeypatch.setenv("BUSINESSFLOW_LOG_LEVEL", "TRACE")
+    with pytest.raises(ValueError, match="BUSINESSFLOW_LOG_LEVEL"):
         Settings.from_environment()
 
 

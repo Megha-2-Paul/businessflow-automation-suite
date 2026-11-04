@@ -41,6 +41,12 @@ def test_database_initializes_and_persists_related_records(tmp_path):
     engine.dispose()
 
 
+def test_initialize_database_is_idempotent(tmp_path):
+    url = f"sqlite:///{tmp_path / 'idempotent.db'}"
+    initialize_database(url)
+    initialize_database(url)
+
+
 def test_database_enforces_foreign_keys(tmp_path):
     from sqlalchemy.exc import IntegrityError
 

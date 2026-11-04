@@ -1,6 +1,8 @@
 """Interactive spreadsheet cleaning, validation and consolidation workspace."""
 from __future__ import annotations
 
+import re
+
 import streamlit as st
 
 from config.settings import get_settings
@@ -15,6 +17,14 @@ from services.spreadsheet_service import record_processing_result
 from validation.spreadsheets import validate_dataframe
 
 settings = get_settings()
+
+
+def _safe_export_stem(filename: str) -> str:
+    """Build a safe, predictable download name from an uploaded filename."""
+    basename = filename.replace(chr(92), "/").rsplit("/", 1)[-1]
+    stem = basename.rsplit(".", 1)[0]
+    safe_stem = re.sub(r"[^A-Za-z0-9_-]+", "_", stem).strip("_-")
+    return safe_stem[:80] or "processed_data"
 max_upload_bytes = settings.max_upload_mb * 1024 * 1024
 
 st.title("Data Workbench")
@@ -114,7 +124,7 @@ with clean_tab:
             st.caption(
                 f"Processing job #{st.session_state['bf_clean_job_id']} saved to history."
             )
-            base_name = st.session_state["bf_source_name"].rsplit(".", 1)[0]
+            base_name = _safe_export_stem(st.session_state["bf_source_name"])
             export_col1, export_col2 = st.columns(2)
             with export_col1:
                 st.download_button(

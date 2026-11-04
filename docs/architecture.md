@@ -22,11 +22,7 @@ Pydantic, Plotly, PyMuPDF, Pytest and Ruff.
 
 ## Persistence
 
-SQLite is the initial local database. SQLAlchemy models and repository boundaries
-keep the persistence layer portable to PostgreSQL. initialize_database creates
-missing tables and currently applies one additive compatibility change for optional
-product links on existing order lines. A formal migration framework remains a
-planned improvement before larger schema changes.
+SQLite is the default local database. PostgreSQL is supported for new installations through SQLAlchemy when the optional psycopg driver is installed. Database URLs are parsed and restricted to supported synchronous SQLite/PostgreSQL drivers. `initialize_database` creates missing tables and applies one additive compatibility change for optional product links on existing SQLite order lines. It does not migrate existing PostgreSQL schemas. A formal migration framework remains necessary before broader schema changes; back up data before upgrades.
 
 Inventory quantities use three-decimal fixed precision. Each stock change adds an
 immutable StockMovement record with its delta and resulting balance. Product
@@ -60,8 +56,9 @@ commitment to source control.
 
 ## Security boundaries
 
-- Secrets belong in environment variables, never source control.
+- Secrets belong in environment variables or a local ignored `.env` file, never source control. Database connection URLs may contain credentials; do not paste them into issue reports or logs.
+- The app has no authentication or role-based access control and is intended for a single trusted workspace. Do not expose it to untrusted networks or multiple unrelated users.
 - Raw and processed uploads are excluded from Git.
-- Upload validation must check file size, extension and actual content.
+- Upload validation checks size, extension and workbook ZIP structure; XLSX archive entry count and expanded size are bounded. CSV/XLSX row and column limits apply after parsing.
 - User-supplied paths must not be trusted.
 - Database writes that change business state must use transactions.

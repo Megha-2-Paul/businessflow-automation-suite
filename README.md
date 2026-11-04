@@ -49,7 +49,7 @@ PyMuPDF, Pytest and Ruff.
 ## Quick start
 
 1. Create and activate a Python 3.11+ virtual environment.
-2. Install dependencies: python -m pip install -e ".[dev]".
+2. Install dependencies: python -m pip install -e ".[dev]". For PostgreSQL, install the optional driver with python -m pip install -e ".[postgres]".
 3. Copy .env.example to .env and adjust settings if needed.
 4. Start the app: python -m streamlit run app.py.
 5. Open the Overview, Data Workbench, Invoice Processing, Order Management,

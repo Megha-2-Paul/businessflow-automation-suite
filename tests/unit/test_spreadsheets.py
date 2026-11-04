@@ -32,6 +32,20 @@ def test_load_xlsx_and_list_sheets():
     assert frame.loc[0, "item"] == "Pen"
 
 
+def test_reject_invalid_xlsx_archive_structure():
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        pd.DataFrame({"item": ["Pen"]}).to_excel(writer, index=False)
+    content = output.getvalue().replace(b"xl/workbook.xml", b"xl/badbook.xml")
+    with pytest.raises(SpreadsheetError, match="required workbook content"):
+        load_tabular_file("bad.xlsx", content, 100_000)
+
+
+def test_reject_nonpositive_upload_limit():
+    with pytest.raises(SpreadsheetError, match="positive"):
+        load_tabular_file("file.csv", b"a,b", 0)
+
+
 def test_reject_unsupported_empty_oversized_and_invalid_workbook():
     with pytest.raises(SpreadsheetError, match="Only CSV"):
         load_tabular_file("data.xls", b"data", 100)
