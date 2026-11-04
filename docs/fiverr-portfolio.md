@@ -12,7 +12,10 @@ reporting and processing history into one local workspace.
 - Selectable-text PDF invoice extraction with human review before saving.
 - Customer order creation, editing and controlled status transitions.
 - Product catalogue, stock movement ledger and physical stocktake reconciliation.
-- Decision-focused dashboard with current-month order KPIs, month-over-month comparisons, six-month trends, order-status mix and inventory health.\n- Currency-aware order-value reporting; the application does not claim order value is collected revenue.\n- Database-backed reports and processing history.\n- Repeatable synthetic Demo workspace with fictional orders, invoices, stock movements and spreadsheet samples.
+- Decision-focused dashboard with current-month order KPIs, month-over-month comparisons, six-month trends, order-status mix and inventory health.
+- Currency-aware order-value reporting; the application does not claim order value is collected revenue.
+- Database-backed reports and processing history.
+- Repeatable synthetic Demo workspace with fictional orders, invoices, stock movements and spreadsheet samples.
 - Separate fictional Demo workspace for safe product walkthroughs.
 
 ## Suggested demonstration sequence
@@ -27,55 +30,12 @@ reporting and processing history into one local workspace.
 8. Open Processing History to inspect recorded workflow activity.
 
 Use only files prepared for demonstration. Never upload client-confidential
-documents or personal data into a public portfolio recording.
+documents or personal data into a public portfolio repository.
 
-## Suggested Fiverr positioning
+## Positioning
 
-**Headline:** Python business workflow automation with Excel, PDF and inventory tools
-
-**Short description:** I build practical Python automations that reduce repetitive
-business work. This project demonstrates spreadsheet cleaning and consolidation,
-PDF invoice extraction with human review, order workflows, inventory tracking
-and downloadable reports.
-
-## Technical stack
-
-Python 3.11+, Streamlit, Pandas, SQLAlchemy, SQLite, Plotly, OpenPyXL,
-PyMuPDF and Pytest.
-
-## Honest scope and limitations
-
-- Invoice extraction currently reads selectable PDF text; scanned PDFs and OCR
-  are not supported.
-- Spreadsheet validation is generic; client-specific business rules need to be
-  agreed and configured for each engagement.
-- External API integrations are not included in this demonstration.
-- Authentication and role-based access are not implemented.
-- The demo dataset is fictional and is not evidence of client outcomes,
-  savings, or production deployment.
-
-## Screenshot checklist
-
-Capture screenshots from the running application, not from concept mockups:
-
-- Business overview in Demo workspace.
-- Data Workbench with a clearly fictional sample file loaded and results visible.
-- Invoice review screen with a purpose-made fictional selectable-text PDF.
-- Orders and inventory pages showing the demo records.
-- Reports export and processing history.
-
-Add a visible "Demo workspace — fictional data" label to any screenshot that
-contains seeded example records.
-
-## Visual capture guidance
-
-Use the Version 3 light-and-minimal Business overview in Demo workspace as the primary portfolio image. Show the monthly KPIs and six-month charts with the fictional-data notice visible.
-Capture the running application at a desktop viewport (ideally 16:9, around
-1440 × 900 pixels) with the sidebar visible, browser zoom at 100%, and no
-developer tools, notifications or personal browser information in view. Keep
-the workspace selector and fictional-demo notice visible where practical.
-Capture the Data Workbench, invoice review, inventory and report pages as
-supporting images. Use consistent viewport dimensions and avoid cropping
-tables, warnings or confirmation controls in a way that changes their meaning.
-Only use genuine application screenshots and fictional demonstration records;
-do not use generated mockups or imply that screenshots show customer data.
+Describe this as a practical business automation tool that helps small teams
+reduce repetitive spreadsheet work, keep order and stock records organised,
+review invoice data and understand operational activity from saved records.
+Do not describe order value as collected revenue or present fictional demo
+records as customer results.
