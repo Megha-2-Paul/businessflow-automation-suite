@@ -19,6 +19,7 @@ from database.models import (
     StockMovement,
 )
 from database.session import get_session_factory, initialize_database
+from database.demo_data import seed_demo_dataset
 
 DEMO_DATABASE_URL = (
     f"sqlite:///{(PROJECT_ROOT / 'data' / 'businessflow-demo.db').as_posix()}"
@@ -131,3 +132,5 @@ def initialize_demo_workspace(database_url: str = DEMO_DATABASE_URL) -> None:
             job_id=job.id, level="INFO",
             message="Fictional demonstration invoice reviewed and saved.",
         ))
+
+    seed_demo_dataset(database_url)
