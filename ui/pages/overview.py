@@ -37,7 +37,10 @@ metric_columns[0].metric("Total orders", f"{orders_total:,}")
 metric_columns[1].metric("Fulfilled orders", f"{fulfilled:,}")
 metric_columns[2].metric(
     "Fulfilment rate", f"{fulfilment_rate:.1f}%" if fulfilment_rate is not None else "—",
-    help="Fulfilled orders divided by confirmed, processing and fulfilled orders. Drafts and cancellations are excluded.",
+    help=(
+        "Fulfilled orders divided by confirmed, processing and fulfilled orders. "
+        "Drafts and cancellations are excluded."
+    ),
 )
 metric_columns[3].metric("Products to reorder", f"{len(low_stock):,}")
 metric_columns[4].metric("Confirmed invoices", f"{insights['confirmed_invoice_count']:,}")
