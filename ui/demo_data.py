@@ -1,7 +1,7 @@
 """Deterministic, isolated synthetic data for the BusinessFlow demo workspace."""
 from __future__ import annotations
 
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 
 from sqlalchemy import select
@@ -17,7 +17,7 @@ def seed_demo_dataset(database_url: str) -> None:
     """Add a realistic demo dataset once; never modify existing business records."""
     factory = get_session_factory(database_url)
     today = date.today()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     products_data = [
         ("DEMO-2001", "Wireless Mouse", "unit", "38", "12"),
         ("DEMO-2002", "USB-C Keyboard", "unit", "24", "8"),
@@ -104,7 +104,7 @@ def seed_demo_dataset(database_url: str) -> None:
                 customer_email=f"buyer{index + 1}@example.invalid",
                 order_date=order_date, currency=currency, status=status, total=total,
                 created_at=datetime.combine(
-                    order_date, datetime.min.time(), tzinfo=timezone.utc
+                    order_date, datetime.min.time(), tzinfo=UTC
                 ),
             )
             session.add(order)
@@ -126,7 +126,7 @@ def seed_demo_dataset(database_url: str) -> None:
                 status="completed", records_processed=1, records_succeeded=1,
                 records_failed=0,
                 created_at=datetime.combine(
-                    invoice_date, datetime.min.time(), tzinfo=timezone.utc
+                    invoice_date, datetime.min.time(), tzinfo=UTC
                 ),
             )
             session.add(job)
@@ -140,7 +140,7 @@ def seed_demo_dataset(database_url: str) -> None:
                 source_filename=f"fictional-invoice-{index + 1:02d}.pdf",
                 page_count=1, review_status="confirmed",
                 created_at=datetime.combine(
-                    invoice_date, datetime.min.time(), tzinfo=timezone.utc
+                    invoice_date, datetime.min.time(), tzinfo=UTC
                 ),
             ))
             session.add(ProcessingLog(
