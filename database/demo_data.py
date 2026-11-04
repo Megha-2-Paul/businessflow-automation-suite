@@ -1,7 +1,5 @@
 """Repeatable fictional records for the isolated demonstration workspace."""
-from __future__ import annotations
-
-from datetime import UTC, date, datetime, time, timedelta
+from datetime import date, datetime, time, timedelta, UTC
 from decimal import Decimal
 
 from sqlalchemy import select
