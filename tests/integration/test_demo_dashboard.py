@@ -112,7 +112,7 @@ def test_dashboard_uses_saved_data_and_keeps_currencies_separate(tmp_path):
     assert result["kpis"]["order_value"] > 0
     assert 0 <= result["kpis"]["fulfillment_rate"] <= 100
     assert result["kpis"]["active_products"] == 12
-    assert result["kpis"]["low_stock"] >= 0
+    assert result["kpis"]["low_stock"] >= 2
     assert all(row["Order value"] >= 0 for row in result["monthly_trend"])
 
     totals = {row["Currency"]: row for row in result["currency_totals"]}
