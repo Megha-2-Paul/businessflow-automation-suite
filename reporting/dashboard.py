@@ -104,7 +104,11 @@ def dashboard_insights(database_url: str, *, today: date | None = None) -> dict:
                 for (key, currency), value in sorted(monthly_revenue.items())
             ],
             "order_value_by_currency": [
-                {"Currency": currency, "Order value": float(value), "Orders": order_counts[currency]}
+                {
+                    "Currency": currency,
+                    "Order value": float(value),
+                    "Orders": order_counts[currency],
+                }
                 for currency, value in sorted(order_totals.items())
             ],
             "average_order_value": [
