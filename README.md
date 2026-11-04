@@ -33,7 +33,7 @@ and a transactional SQLAlchemy persistence layer.
 - Prevent negative stock and block stale stocktake reconciliation.
 
 ### Dashboard, reporting and traceability
-- Review live order, invoice, product and low-stock counts on the dashboard.
+- Review period-based order KPIs, order trends, order-status distribution, stock health, low-stock items and confirmed invoice values on the dashboard. KPIs and charts are calculated from saved workspace records; committed order value excludes drafts and cancellations, and currency totals remain separate.
 - Analyse order status and current stock position from persisted records.
 - View order values grouped by currency; currencies are never combined.
 - Export orders, invoices, inventory, stock movements and processing activity
@@ -44,8 +44,7 @@ and a transactional SQLAlchemy persistence layer.
 ## Demonstration workspace
 
 The sidebar includes a separate Demo workspace backed by
-`data/businessflow-demo.db`. The first selection creates clearly fictional
-sample products, stock balances, an order, an invoice and processing activity.
+`data/businessflow-demo.db`. The first selection creates an idempotent fictional dataset with 12 products, 30 orders, 20 confirmed invoices, stock movements and processing activity. The dashboard calculates period-based KPIs and charts from these persisted records; it does not display hard-coded business metrics.
 The demo database is separate from the configured live database; switching
 workspaces changes which database the UI reads and writes. Demo records are
 local examples, not customer results. Remove the demo database file to reset
@@ -75,8 +74,7 @@ Do not commit .env, local databases, uploads or private business data.
 No customer records, synthetic stock balances or fabricated business outcomes
 are bundled. Inventory starts at zero unless a user enters a real opening
 balance. Dashboard figures and reports are computed from saved workspace data.
-Public datasets may be downloaded separately after reviewing licence,
-attribution and privacy conditions. See data/README.md.
+Fictional spreadsheet examples for cleaning and consolidation are provided in `sample_data/`. These files intentionally include a duplicate and a missing value for validation demonstrations. Public datasets may be downloaded separately after reviewing licence, attribution and privacy conditions. See data/README.md.
 
 ## Architecture
 

@@ -1,0 +1,7 @@
+order_id,customer,email,order_date,product,quantity,unit_price,status
+SMP-1018,Logan Price,logan@example.invalid,2026-11-02,Ergonomic Desk Mat,2,24.99,Confirmed
+SMP-1019,Finley Scott,finley@example.invalid,2026-11-03,Wireless Mouse,1,19.99,Fulfilled
+SMP-1020,Alex Harper,alex@example.invalid,2026-11-03,LED Desk Lamp,2,39.99,Processing
+SMP-1021,Blake Turner,blake@example.invalid,2026-11-03,USB-C Keyboard,1,59.00,Draft
+SMP-1022,Remy Cooper,remy@example.invalid,2026-11-04,Webcam,1,49.98,Confirmed
+SMP-1023,Charlie Diaz,charlie@example.invalid,2026-11-04,Portable SSD 1TB,1,88.00,Processing

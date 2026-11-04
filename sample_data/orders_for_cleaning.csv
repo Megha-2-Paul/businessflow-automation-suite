@@ -1,0 +1,19 @@
+order_id,customer,email,order_date,product,quantity,unit_price,status
+SMP-1001,Avery Morgan,avery@example.invalid,2026-10-02,Wireless Mouse,2,19.99,Fulfilled
+SMP-1002,Jordan Lee,jordan@example.invalid,2026-10-04,USB-C Keyboard,1,59.00,Confirmed
+SMP-1003,Taylor Bennett,taylor@example.invalid,2026-10-05,Laptop Stand,1,44.00,Processing
+SMP-1004,Casey Rivera,casey@example.invalid,2026-10-08,1080p Webcam,2,49.98,Fulfilled
+SMP-1005,Riley Parker,riley@example.invalid,2026-10-11,Portable SSD 1TB,1,88.00,Confirmed
+SMP-1006,Morgan Ellis,morgan@example.invalid,2026-10-13,Desk Mat,3,24.99,Draft
+SMP-1007,Cameron Brooks,cameron@example.invalid,2026-10-15,USB-C Docking Station,1,158.00,Fulfilled
+SMP-1008,Quinn Bailey,quinn@example.invalid,2026-10-18,Wireless Presenter,2,34.50,Processing
+SMP-1009,Drew Foster,drew@example.invalid,2026-10-20,LED Desk Lamp,1,39.99,Confirmed
+SMP-1010,Alex Harper,alex@example.invalid,2026-10-22,Noise-Cancelling Headset,1,79.00,Fulfilled
+SMP-1011,Jamie Collins,jamie@example.invalid,2026-10-24,Wireless Mouse,2,19.99,Fulfilled
+SMP-1012,Reese Murphy,reese@example.invalid,2026-10-26,Laptop Sleeve,1,29.50,Confirmed
+SMP-1013,Skyler Reed,skyler@example.invalid,2026-10-28,Webcam,1,49.98,Processing
+SMP-1014,Peyton Ross,,2026-10-29,Keyboard,2,59.00,Draft
+SMP-1015,Rowan James,rowan@example.invalid,2026-10-30,Desk Lamp,1,39.99,Fulfilled
+SMP-1015,Rowan James,rowan@example.invalid,2026-10-30,Desk Lamp,1,39.99,Fulfilled
+SMP-1016,Emerson Gray,emerson@example.invalid,2026-11-01,USB-C Docking Station,1,158.00,Confirmed
+SMP-1017,Harper Lane,harper@example.invalid,2026-11-02,Portable SSD 1TB,2,88.00,Processing

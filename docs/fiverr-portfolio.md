@@ -13,7 +13,8 @@ reporting and processing history into one local workspace.
 - Selectable-text PDF invoice extraction with human review before saving.
 - Customer order creation, editing and controlled status transitions.
 - Product catalogue, stock movement ledger and physical stocktake reconciliation.
-- Database-backed dashboard, downloadable reports and processing history.
+- Database-backed dashboard with selectable 30/90/365-day KPIs, order trends, order-status mix, currency-separated order values and average order values, confirmed invoice values, and current inventory health.
+- Idempotent fictional demo dataset with 12 products, 30 orders, 20 invoices and stock/processing history. Sample CSV files support spreadsheet-cleaning and consolidation demonstrations.
 - Separate fictional Demo workspace for safe product walkthroughs.
 
 ## Suggested demonstration sequence
@@ -76,7 +77,11 @@ Capture the running application at a desktop viewport (ideally 16:9, around
 developer tools, notifications or personal browser information in view. Keep
 the workspace selector and fictional-demo notice visible where practical.
 Capture the Data Workbench, invoice review, inventory and report pages as
-supporting images. Use consistent viewport dimensions and avoid cropping
+supporting images. On the dashboard, choose a reporting period that contains
+sample activity and show the order trend, status mix, inventory health, low-stock
+attention and currency breakdown. Dashboard metrics are computed from saved
+records; order value is not cash collected or profit, and invoice totals are
+shown separately. Keep the demo-data notice visible. Use consistent viewport dimensions and avoid cropping
 tables, warnings or confirmation controls in a way that changes their meaning.
 Only use genuine application screenshots and fictional demonstration records;
 do not use generated mockups or imply that screenshots show customer data.
