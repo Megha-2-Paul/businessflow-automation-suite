@@ -1,7 +1,7 @@
 """Database-backed operational summaries and report datasets."""
 from __future__ import annotations
 
-from datetime import date, datetime, time, timezone
+from datetime import UTC, date, datetime, time
 from typing import Any
 
 import pandas as pd
@@ -30,8 +30,8 @@ def _date_bounds(
 ) -> tuple[datetime | None, datetime | None]:
     if start_date and end_date and start_date > end_date:
         raise ValueError("Start date cannot be after end date.")
-    start = datetime.combine(start_date, time.min, tzinfo=timezone.utc) if start_date else None
-    end = datetime.combine(end_date, time.max, tzinfo=timezone.utc) if end_date else None
+    start = datetime.combine(start_date, time.min, tzinfo=UTC) if start_date else None
+    end = datetime.combine(end_date, time.max, tzinfo=UTC) if end_date else None
     return start, end
 
 

@@ -32,7 +32,10 @@ if report_type != "inventory":
     start = start_date if use_start else None
     end = end_date if use_end else None
 else:
-    st.caption("Inventory is a current stock snapshot; historical stock balances are not reconstructed.")
+    st.caption(
+        "Inventory is a current stock snapshot; historical stock balances are "
+        "not reconstructed."
+    )
 
 try:
     frame = report_data(settings.database_url, report_type, start_date=start, end_date=end)
