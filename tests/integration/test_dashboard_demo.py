@@ -77,3 +77,16 @@ def test_dashboard_rejects_unsupported_period_and_handles_empty_database(tmp_pat
     assert summary["business_name"] == "No workspace"
     assert summary["orders_count"] == 0
     assert summary["order_trend"] == []
+
+
+def test_order_value_kpis_exclude_draft_and_cancelled_orders(tmp_path):
+    url = f"sqlite:///{tmp_path / 'order-value.db'}"
+    seed_demo_data(url)
+    summary = dashboard_metrics(url, 365)
+    factory = get_session_factory(url)
+    with factory() as session:
+        committed = session.scalars(
+            select(Order).where(Order.status.in_(["Confirmed", "Processing", "Fulfilled"]))
+        ).all()
+    expected = sum(order.total for order in committed)
+    assert summary["currency_totals"][0]["Order value"] == float(expected)
