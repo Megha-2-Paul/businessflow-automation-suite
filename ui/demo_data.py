@@ -7,8 +7,15 @@ from decimal import Decimal
 from sqlalchemy import select
 
 from database.models import (
-    Business, DatasetSource, Invoice, Order, OrderLineItem, ProcessingJob,
-    ProcessingLog, Product, StockMovement,
+    Business,
+    DatasetSource,
+    Invoice,
+    Order,
+    OrderLineItem,
+    ProcessingJob,
+    ProcessingLog,
+    Product,
+    StockMovement,
 )
 from database.session import get_session_factory
 
