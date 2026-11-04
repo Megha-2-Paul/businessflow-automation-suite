@@ -9,7 +9,11 @@ from config.settings import get_settings
 from database.models import Business, Order
 from database.session import get_session_factory
 from services.order_service import (
-    STATUSES, OrderServiceError, change_order_status, create_order, update_order,
+    STATUSES,
+    OrderServiceError,
+    change_order_status,
+    create_order,
+    update_order,
 )
 
 settings = get_settings()
@@ -53,39 +57,62 @@ with factory() as session:
     query = select(Order).join(Business).order_by(Order.created_at.desc())
     if search.strip():
         term = f"%{search.strip()}%"
-        query = query.where(or_(Order.order_number.ilike(term), Order.customer_name.ilike(term)))
+        query = query.where(
+            or_(Order.order_number.ilike(term), Order.customer_name.ilike(term))
+        )
     if status != "All statuses":
         query = query.where(Order.status == status)
     orders = session.scalars(query.limit(250)).all()
-    rows = [{
-        "ID": item.id, "Order": item.order_number, "Customer": item.customer_name,
-        "Date": item.order_date, "Status": item.status,
-        "Total": f"{item.currency} {item.total:,.2f}",
-    } for item in orders]
+    rows = [
+        {
+            "ID": item.id,
+            "Order": item.order_number,
+            "Customer": item.customer_name,
+            "Date": item.order_date,
+            "Status": item.status,
+            "Total": f"{item.currency} {item.total:,.2f}",
+        }
+        for item in orders
+    ]
 if rows:
     st.dataframe(rows, use_container_width=True, hide_index=True)
     order_id = st.selectbox("Manage order", [row["ID"] for row in rows])
     with factory() as session:
         order = session.get(Order, order_id)
         if order:
-            st.write(f"**{order.order_number}** · {order.customer_name} · {order.currency} {order.total:,.2f}")
+            st.write(
+                f"**{order.order_number}** · {order.customer_name} · "
+                f"{order.currency} {order.total:,.2f}"
+            )
             if order.status == "Draft":
                 with st.form(f"edit_order_{order.id}"):
                     edit_customer = st.text_input("Customer", value=order.customer_name)
-                    edit_email = st.text_input("Customer email", value=order.customer_email or "")
-                    edit_currency = st.text_input("Currency", value=order.currency, max_chars=3)
-                    frame = pd.DataFrame([{
-                        "description": line.description,
-                        "quantity": float(line.quantity),
-                        "unit_price": float(line.unit_price),
-                    } for line in order.line_items])
-                    edit_lines = st.data_editor(frame, num_rows="dynamic", use_container_width=True)
+                    edit_email = st.text_input(
+                        "Customer email", value=order.customer_email or ""
+                    )
+                    edit_currency = st.text_input(
+                        "Currency", value=order.currency, max_chars=3
+                    )
+                    frame = pd.DataFrame(
+                        [
+                            {
+                                "description": line.description,
+                                "quantity": float(line.quantity),
+                                "unit_price": float(line.unit_price),
+                            }
+                            for line in order.line_items
+                        ]
+                    )
+                    edit_lines = st.data_editor(
+                        frame, num_rows="dynamic", use_container_width=True
+                    )
                     edit = st.form_submit_button("Save draft changes")
                 if edit:
                     try:
                         update_order(
-                            settings.database_url, order.id, customer_name=edit_customer,
-                            customer_email=edit_email, currency=edit_currency,
+                            settings.database_url, order.id,
+                            customer_name=edit_customer, customer_email=edit_email,
+                            currency=edit_currency,
                             line_items=edit_lines.to_dict(orient="records"),
                         )
                         st.success("Draft order updated.")
@@ -96,7 +123,8 @@ if rows:
                 "Draft": ["Confirmed", "Cancelled"],
                 "Confirmed": ["Processing", "Cancelled"],
                 "Processing": ["Fulfilled", "Cancelled"],
-                "Fulfilled": [], "Cancelled": [],
+                "Fulfilled": [],
+                "Cancelled": [],
             }[order.status]
             if allowed:
                 next_status = st.selectbox("Change status to", allowed)

@@ -1,4 +1,4 @@
-"""Processing history for spreadsheet and invoice workflows."""
+"""Processing history for spreadsheet, invoice and order workflows."""
 import streamlit as st
 from sqlalchemy import select
 
@@ -8,7 +8,7 @@ from database.session import get_session_factory
 
 settings = get_settings()
 st.title("Processing history")
-st.caption("Review recent spreadsheet and invoice jobs recorded in the local database.")
+st.caption("Review recent workflow jobs recorded in the local database.")
 factory = get_session_factory(settings.database_url)
 with factory() as session:
     statement = (
@@ -16,7 +16,12 @@ with factory() as session:
         .join(Business)
         .where(
             ProcessingJob.job_type.in_(
-                ["spreadsheet_clean", "spreadsheet_consolidation", "invoice_extraction", "order_management"]
+                [
+                    "spreadsheet_clean",
+                    "spreadsheet_consolidation",
+                    "invoice_extraction",
+                    "order_management",
+                ]
             )
         )
         .order_by(ProcessingJob.created_at.desc())

@@ -25,5 +25,8 @@ def build_navigation():
         "ui/pages/settings.py", title="Settings", icon=":material/settings:"
     )
     return st.navigation(
-        {"Workspace": [overview, data_workbench, invoices, orders, history], "Application": [settings]}
+        {
+            "Workspace": [overview, data_workbench, invoices, orders, history],
+            "Application": [settings],
+        }
     )
