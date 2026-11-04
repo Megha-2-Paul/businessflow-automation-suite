@@ -86,7 +86,7 @@ SQLAlchemy persists operational records and processing history. SQLite is the
 initial database, with PostgreSQL support through SQLAlchemy-compatible
 configuration. Existing SQLite installations receive an additive product_id
 column for optional order-line catalogue links during database initialization.
-See docs/architecture.md for persistence and reporting boundaries.
+See docs/architecture.md for persistence and reporting boundaries. Fiverr portfolio positioning and a safe demo walkthrough are in [docs/fiverr-portfolio.md](docs/fiverr-portfolio.md).
 
 ## Known limitations
 
