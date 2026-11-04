@@ -105,7 +105,7 @@ def seed_demo_dataset(database_url: str) -> None:
             session.flush()
             session.add(OrderLineItem(
                 order_id=order.id, description=product.name, quantity=quantity,
-                unit_price=price, amount=amount, product_id=product.id,
+                unit_price=price, amount=amount,
             ))
 
         for index in range(16):
