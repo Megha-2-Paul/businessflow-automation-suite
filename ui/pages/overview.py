@@ -7,6 +7,27 @@ from config.settings import get_settings
 from reporting.dashboard import dashboard_insights
 from ui.workspace import get_database_url
 
+
+def _style_chart(fig, *, height: int = 330) -> None:
+    """Apply consistent typography, spacing and grid styling to Plotly charts."""
+    fig.update_layout(
+        height=height,
+        margin={"l": 12, "r": 12, "t": 24, "b": 12},
+        plot_bgcolor="#ffffff",
+        paper_bgcolor="#ffffff",
+        font={"color": "#435349", "size": 12},
+        hoverlabel={"bgcolor": "#ffffff", "font_color": "#172b25"},
+        legend={"bgcolor": "rgba(255,255,255,0)", "font": {"color": "#435349"}},
+    )
+    fig.update_xaxes(showgrid=False, automargin=True)
+    fig.update_yaxes(
+        gridcolor="#edf1ed",
+        zerolinecolor="#dfe7e0",
+        rangemode="tozero",
+        automargin=True,
+    )
+
+
 settings = get_settings()
 database_url = get_database_url(settings.database_url)
 demo_mode = st.session_state.get("bf_workspace_mode") == "Demo"
@@ -40,7 +61,6 @@ st.caption(
     f"Order values and average order value are shown in {currency}; "
     "these figures are not collected revenue."
 )
-columns = st.columns(5)
 metrics = [
     (
         "Order value",
@@ -73,8 +93,11 @@ metrics = [
         "Products at or below their configured reorder level.",
     ),
 ]
-for column, (label, value, delta, help_text) in zip(columns, metrics):
-    column.metric(label, value, delta, help=help_text)
+for start in (0, 3):
+    row = st.columns(3 if start == 0 else 2)
+    for column, metric in zip(row, metrics[start : start + len(row)]):
+        label, value, delta, help_text = metric
+        column.metric(label, value, delta, help=help_text)
 
 if kpis["low_stock"]:
     st.warning(
@@ -84,53 +107,51 @@ if kpis["low_stock"]:
 else:
     st.success("All active products are currently above their reorder levels.")
 
-left, right = st.columns([1.25, 1])
 trend = pd.DataFrame(data["monthly_trend"])
+st.divider()
+st.subheader("Sales and order trends")
+st.caption(
+    "Order counts include all currencies. Order values include only the "
+    f"selected business currency ({currency}) and are not collected revenue."
+)
+left, right = st.columns(2)
 with left:
-    st.subheader("Order activity · last 6 months")
+    st.markdown("**Order activity · last 6 months**")
     if not trend.empty:
-        fig = px.bar(trend, x="Month", y="Orders", text_auto=True)
+        fig = px.bar(
+            trend,
+            x="Month",
+            y="Orders",
+            text_auto=True,
+            labels={"Month": "Month", "Orders": "Orders"},
+        )
         fig.update_traces(
             marker_color="#72b987",
             marker_line_width=0,
             textposition="outside",
+            cliponaxis=False,
+            hovertemplate="%{x}<br>%{y} orders<extra></extra>",
         )
-        fig.update_layout(
-            height=315,
-            margin=dict(l=10, r=10, t=20, b=10),
-            plot_bgcolor="#ffffff",
-            paper_bgcolor="#ffffff",
-            font_color="#435349",
-            yaxis_title="Orders · all currencies",
-            xaxis_title=None,
-            showlegend=False,
-        )
-        fig.update_yaxes(gridcolor="#edf1ed", rangemode="tozero")
-        fig.update_xaxes(showgrid=False)
+        _style_chart(fig)
         st.plotly_chart(fig, use_container_width=True)
     else:
-        st.info("Order trend will appear after orders are recorded.")
+        st.info("Order activity will appear after orders are recorded.")
 
 with right:
-    st.subheader("Order value trend")
+    st.markdown(f"**Order value · {currency}**")
     if not trend.empty and trend["Order value"].sum() > 0:
-        fig = px.area(trend, x="Month", y="Order value")
+        fig = px.area(
+            trend,
+            x="Month",
+            y="Order value",
+            labels={"Month": "Month", "Order value": f"Order value ({currency})"},
+        )
         fig.update_traces(
-            line_color="#23845b",
+            line={"color": "#23845b", "width": 3},
             fillcolor="rgba(115,185,135,.18)",
+            hovertemplate="%{x}<br>%{y:,.2f} " + currency + "<extra></extra>",
         )
-        fig.update_layout(
-            height=315,
-            margin=dict(l=10, r=10, t=20, b=10),
-            plot_bgcolor="#ffffff",
-            paper_bgcolor="#ffffff",
-            font_color="#435349",
-            yaxis_title=f"Order value ({currency})",
-            xaxis_title=None,
-            showlegend=False,
-        )
-        fig.update_yaxes(gridcolor="#edf1ed", rangemode="tozero")
-        fig.update_xaxes(showgrid=False)
+        _style_chart(fig)
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.info(
@@ -138,9 +159,10 @@ with right:
         )
 
 st.divider()
-left, right = st.columns([1, 1.2])
+st.subheader("Operations snapshot")
+left, right = st.columns([0.9, 1.35])
 with left:
-    st.subheader("Orders by status")
+    st.markdown("**Orders by status**")
     st.caption("Draft orders are included; cancelled orders are excluded.")
     status = pd.DataFrame(data["status_mix"])
     if not status.empty:
@@ -150,26 +172,33 @@ with left:
             values="Orders",
             hole=0.62,
             color_discrete_sequence=[
-                "#75b989",
+                "#23845b",
+                "#83bd98",
                 "#a9d6b5",
-                "#3d8d64",
-                "#cbd8ce",
+                "#d4e2d7",
+                "#5b9b78",
             ],
         )
         fig.update_layout(
-            height=300,
-            margin=dict(l=8, r=8, t=12, b=8),
+            height=330,
+            margin={"l": 8, "r": 8, "t": 18, "b": 8},
             paper_bgcolor="#ffffff",
-            font_color="#435349",
+            font={"color": "#435349", "size": 12},
             legend_title_text="",
+            legend={"orientation": "h", "y": -0.08},
         )
-        fig.update_traces(textposition="inside", textinfo="percent")
+        fig.update_traces(
+            textposition="inside",
+            textinfo="percent",
+            hovertemplate="%{label}: %{value} orders (%{percent})<extra></extra>",
+        )
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.info("Status distribution will appear after orders are saved.")
 
 with right:
-    st.subheader("Inventory health")
+    st.markdown("**Inventory health**")
+    st.caption("Products closest to or below their configured reorder level.")
     inventory = pd.DataFrame(data["inventory"])
     if not inventory.empty:
         st.dataframe(
@@ -184,6 +213,7 @@ with right:
     else:
         st.info("Add products to start monitoring stock levels.")
 
+st.divider()
 st.subheader("Order value by currency")
 st.caption(
     "Currencies are reported separately. Active orders only; "
