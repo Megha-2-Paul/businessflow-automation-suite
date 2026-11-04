@@ -1,4 +1,4 @@
-"""Live operational dashboard for the selected business workspace."""
+"""Decision-focused overview built entirely from saved workspace records."""
 from __future__ import annotations
 
 import pandas as pd
@@ -6,81 +6,146 @@ import plotly.express as px
 import streamlit as st
 
 from config.settings import get_settings
+from reporting.dashboard import dashboard_insights
 from reporting.service import dashboard_summary
 from ui.workspace import get_database_url
 
 settings = get_settings()
 demo_mode = st.session_state.get("bf_workspace_mode") == "Demo"
-summary = dashboard_summary(get_database_url(settings.database_url))
+database_url = get_database_url(settings.database_url)
+summary = dashboard_summary(database_url)
+insights = dashboard_insights(database_url)
 
-st.markdown('<div class="bf-page-eyebrow">BUSINESS OPERATIONS</div>', unsafe_allow_html=True)
+st.markdown('<div class="bf-page-eyebrow">BUSINESS PERFORMANCE</div>', unsafe_allow_html=True)
 st.title("Business overview")
 st.caption(
-    f"Operational snapshot · {summary['business_name']} · "
-    "Figures are calculated from records saved in the selected workspace."
+    f"{summary['business_name']} · Live operational snapshot · "
+    "All figures are calculated from saved workspace records."
 )
 if demo_mode:
     st.info(
-        "Demo workspace: all records shown here are fictional examples stored "
-        "separately from your live business database."
+        "DEMO DATA · Fictional example records for product demonstration. "
+        "Switch to Live workspace to view your own saved business records."
     )
 
+low_stock = insights["low_stock_products"]
+orders_total = summary["orders_total"]
+fulfilled = insights["fulfilled_orders"]
+fulfilment_rate = insights["fulfilment_rate"]
 metric_columns = st.columns(5)
-metrics = [
-    ("Total orders", summary["orders_total"]),
-    ("Open orders", summary["orders_open"]),
-    ("Awaiting fulfilment", summary["orders_awaiting_fulfilment"]),
-    ("Confirmed invoices", summary["invoices_confirmed"]),
-    ("Active products", summary["products_active"]),
-]
-for column, (label, value) in zip(metric_columns, metrics):
-    column.metric(label, f"{value:,}")
+metric_columns[0].metric("Total orders", f"{orders_total:,}")
+metric_columns[1].metric("Fulfilled orders", f"{fulfilled:,}")
+metric_columns[2].metric(
+    "Fulfilment rate", f"{fulfilment_rate:.1f}%" if fulfilment_rate is not None else "—",
+    help=(
+        "Fulfilled orders divided by confirmed, processing and fulfilled orders. "
+        "Drafts and cancellations are excluded."
+    ),
+)
+metric_columns[3].metric("Products to reorder", f"{len(low_stock):,}")
+metric_columns[4].metric("Confirmed invoices", f"{insights['confirmed_invoice_count']:,}")
 
-low_stock = summary["products_low_stock"]
 if low_stock:
     st.warning(
-        f"{low_stock} active product(s) are at or below their reorder level. "
-        "Review Inventory Management."
+        f"{len(low_stock)} active product(s) are at or below their reorder level. "
+        "Review the stock risk list below before accepting more demand."
     )
 else:
     st.success("No active products are currently at or below their reorder level.")
 
-left, right = st.columns([1.15, 1])
-with left:
-    st.subheader("Order status")
-    if summary["order_statuses"]:
-        status_frame = pd.DataFrame(summary["order_statuses"])
-        chart = px.bar(
-            status_frame, x="Status", y="Orders", text_auto=True,
-            color="Orders", color_continuous_scale=["#bfdbfe", "#1769c2"],
-        )
-        chart.update_layout(
-            height=320, margin=dict(l=12, r=12, t=20, b=12),
-            plot_bgcolor="white", paper_bgcolor="white",
-            coloraxis_showscale=False, xaxis_title=None, yaxis_title="Orders",
-        )
-        st.plotly_chart(chart, use_container_width=True)
-    else:
-        st.info("Order status analysis will appear after orders are saved.")
-with right:
-    st.subheader("Order value by currency")
-    st.caption("Currencies are kept separate and are never added together.")
-    if summary["currency_totals"]:
-        st.dataframe(summary["currency_totals"], use_container_width=True, hide_index=True)
-    else:
-        st.info("No order values are available yet.")
-
-st.subheader("Inventory position")
-if summary["stock_levels"]:
-    st.dataframe(
-        pd.DataFrame(summary["stock_levels"]),
-        use_container_width=True, hide_index=True,
+st.subheader("Order activity")
+st.caption("Monthly order counts for the last six calendar months, based on order dates.")
+if insights["monthly_orders"]:
+    trend = pd.DataFrame(insights["monthly_orders"])
+    chart = px.bar(
+        trend, x="Month", y="Orders", text_auto=True,
+        color_discrete_sequence=["#72b58c"],
     )
+    chart.update_layout(
+        height=300, margin=dict(l=8, r=8, t=16, b=8),
+        plot_bgcolor="white", paper_bgcolor="white",
+        xaxis_title=None, yaxis_title="Orders",
+    )
+    chart.update_traces(marker_line_width=0, textposition="outside")
+    st.plotly_chart(chart, use_container_width=True)
 else:
-    st.info(
-        "No products have been added. Add catalogue items and opening balances "
-        "in Inventory Management."
-    )
+    st.info("Order activity will appear after orders are saved.")
+
+left, right = st.columns([1.2, 1])
+with left:
+    st.subheader("Order value by currency")
+    st.caption("Non-cancelled order totals. Different currencies are never combined.")
+    if insights["order_value_by_currency"]:
+        st.dataframe(
+            pd.DataFrame(insights["order_value_by_currency"]),
+            use_container_width=True, hide_index=True,
+        )
+        if insights["monthly_revenue"]:
+            revenue = pd.DataFrame(insights["monthly_revenue"])
+            revenue_chart = px.line(
+                revenue, x="Month", y="Order value", color="Currency",
+                markers=True, facet_row="Currency",
+                color_discrete_sequence=["#24845a", "#77a98c", "#a7c9b4"],
+            )
+            revenue_chart.update_layout(
+                height=max(220, 190 * revenue["Currency"].nunique()),
+                margin=dict(l=8, r=8, t=16, b=8),
+                plot_bgcolor="white", paper_bgcolor="white",
+                showlegend=False, xaxis_title=None, yaxis_title="Order value",
+            )
+            st.plotly_chart(revenue_chart, use_container_width=True)
+    else:
+        st.info("Order values will appear after non-cancelled orders are saved.")
+
+    st.subheader("Confirmed invoice value")
+    st.caption("Confirmed invoice totals, not payment receipts or outstanding balances.")
+    if insights["invoice_totals"]:
+        st.dataframe(
+            pd.DataFrame(insights["invoice_totals"]),
+            use_container_width=True, hide_index=True,
+        )
+    else:
+        st.info("Confirmed invoice values will appear after invoices are reviewed and saved.")
+
+with right:
+    st.subheader("Inventory health")
+    if insights["inventory_status"]:
+        inventory = pd.DataFrame(insights["inventory_status"])
+        inventory = inventory[inventory["Products"] > 0]
+        if not inventory.empty:
+            stock_chart = px.pie(
+                inventory, names="Stock status", values="Products", hole=0.62,
+                color="Stock status",
+                color_discrete_map={
+                    "Healthy": "#63a77e", "Low stock": "#e7b84b",
+                    "Out of stock": "#d96b63",
+                },
+            )
+            stock_chart.update_layout(
+                height=290, margin=dict(l=8, r=8, t=16, b=8),
+                paper_bgcolor="white", legend_title=None,
+            )
+            st.plotly_chart(stock_chart, use_container_width=True)
+        else:
+            st.info("No active catalogue products are available.")
+    else:
+        st.info("Inventory status will appear after products are added.")
+
+    st.subheader("Average order value")
+    st.caption("Calculated separately for each currency, excluding cancelled orders.")
+    if insights["average_order_value"]:
+        st.dataframe(
+            pd.DataFrame(insights["average_order_value"]),
+            use_container_width=True, hide_index=True,
+        )
+    else:
+        st.info("Average order value is unavailable until eligible orders exist.")
+
+st.subheader("Stock requiring attention")
+if low_stock:
+    st.dataframe(pd.DataFrame(low_stock), use_container_width=True, hide_index=True)
+else:
+    st.caption("No products currently require a reorder review.")
 
 st.subheader("Recent processing activity")
 if summary["recent_jobs"]:
@@ -89,10 +154,7 @@ if summary["recent_jobs"]:
         use_container_width=True, hide_index=True,
     )
 else:
-    st.info(
-        "No workflow activity has been recorded yet. Process a spreadsheet, "
-        "confirm an invoice, or update an order or product to begin building history."
-    )
+    st.info("Completed spreadsheet and invoice workflows will appear here.")
 
 st.divider()
 st.subheader("Continue working")

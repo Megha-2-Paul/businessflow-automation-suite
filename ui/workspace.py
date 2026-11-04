@@ -8,6 +8,7 @@ import streamlit as st
 from sqlalchemy import select
 
 from config.settings import PROJECT_ROOT
+from database.demo_data import seed_demo_dataset
 from database.models import (
     Business,
     Invoice,
@@ -44,6 +45,7 @@ def configure_workspace(default_url: str) -> str:
     st.session_state["bf_workspace_mode"] = mode
     if mode == "Demo":
         initialize_demo_workspace()
+        seed_demo_dataset(DEMO_DATABASE_URL)
         st.sidebar.info("Demonstration data · isolated from live records")
         return DEMO_DATABASE_URL
     st.sidebar.caption("Live business data")
