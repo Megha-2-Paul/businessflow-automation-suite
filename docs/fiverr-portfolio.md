@@ -67,3 +67,16 @@ Capture screenshots from the running application, not from concept mockups:
 
 Add a visible "Demo workspace — fictional data" label to any screenshot that
 contains seeded example records.
+
+## Visual capture guidance
+
+Use the Business overview in Demo workspace as the primary portfolio image.
+Capture the running application at a desktop viewport (ideally 16:9, around
+1440 × 900 pixels) with the sidebar visible, browser zoom at 100%, and no
+developer tools, notifications or personal browser information in view. Keep
+the workspace selector and fictional-demo notice visible where practical.
+Capture the Data Workbench, invoice review, inventory and report pages as
+supporting images. Use consistent viewport dimensions and avoid cropping
+tables, warnings or confirmation controls in a way that changes their meaning.
+Only use genuine application screenshots and fictional demonstration records;
+do not use generated mockups or imply that screenshots show customer data.
