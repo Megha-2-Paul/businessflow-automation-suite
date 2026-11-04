@@ -7,6 +7,7 @@ from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import selectinload
 
 from database.models import (
     Business,
@@ -231,10 +232,15 @@ def list_products(database_url: str, *, active_only: bool = False) -> list[Produ
 
 
 def list_movements(database_url: str, *, limit: int = 100) -> list[StockMovement]:
-    """Return recent stock movements for the current workspace."""
+    """Return recent stock movements with products loaded before the session closes."""
     with get_session_factory(database_url)() as session:
         business_id = _business_id(session)
-        return list(session.scalars(
-            select(StockMovement).join(Product).where(Product.business_id == business_id)
-            .order_by(StockMovement.created_at.desc()).limit(max(1, min(limit, 500)))
-        ).all())
+        statement = (
+            select(StockMovement)
+            .join(StockMovement.product)
+            .where(Product.business_id == business_id)
+            .options(selectinload(StockMovement.product))
+            .order_by(StockMovement.created_at.desc())
+            .limit(max(1, min(limit, 500)))
+        )
+        return list(session.scalars(statement).all())

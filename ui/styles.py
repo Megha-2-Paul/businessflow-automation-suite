@@ -34,17 +34,40 @@ def apply_global_styles() -> None:
             padding: 16px 18px;
             box-shadow: 0 1px 2px rgba(16, 36, 64, .04);
         }
-        div[data-testid="stMetricLabel"] { color: var(--bf-muted); font-weight: 600; }
-        div[data-testid="stMetricValue"] { color: var(--bf-ink); font-weight: 700; }
-        div[data-testid="stDataFrame"], div[data-testid="stTable"] {
+        div[data-testid="stMetricLabel"],
+        div[data-testid="stMetricLabel"] p,
+        div[data-testid="stMetricLabel"] label {
+            color: #52637a !important;
+            font-weight: 600;
+        }
+        div[data-testid="stMetricValue"],
+        div[data-testid="stMetricValue"] div {
+            color: var(--bf-ink) !important;
+            font-weight: 700;
+        }
+        [data-testid="stDataFrame"], [data-testid="stTable"] {
             border: 1px solid var(--bf-border);
             border-radius: 10px;
             overflow: hidden;
+        }
+        [data-testid="stWidgetLabel"],
+        [data-testid="stWidgetLabel"] p,
+        [data-testid="stWidgetLabel"] label,
+        [data-testid="stMarkdownContainer"] p {
+            color: #334155;
+        }
+        [data-testid="stTabs"] button[role="tab"] {
+            color: #42536a !important;
+            font-weight: 600;
+        }
+        [data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
+            color: var(--bf-blue-dark) !important;
         }
         .stButton > button[kind="primary"],
         .stDownloadButton > button[kind="primary"] {
             background: var(--bf-blue);
             border-color: var(--bf-blue);
+            color: #ffffff !important;
         }
         .stButton > button, .stDownloadButton > button {
             border-radius: 8px;
@@ -56,7 +79,12 @@ def apply_global_styles() -> None:
             border: 1px solid var(--bf-border);
             border-radius: 10px;
         }
-        [data-testid="stAlert"] { border-radius: 10px; }
+        [data-testid="stAlert"] {
+            border-radius: 10px;
+        }
+        [data-testid="stAlert"] p {
+            color: #24364b !important;
+        }
         hr { border-color: var(--bf-border); }
         .bf-muted { color: var(--bf-muted); }
         </style>
