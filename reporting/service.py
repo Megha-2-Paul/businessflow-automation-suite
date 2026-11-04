@@ -51,6 +51,13 @@ def dashboard_summary(database_url: str) -> dict[str, Any]:
             "order_statuses": [],
             "stock_levels": [],
             "currency_totals": [],
+            "orders_this_month": 0,
+            "fulfillment_rate": None,
+            "current_month_order_totals": [],
+            "monthly_order_trend": [],
+            "confirmed_vendor_payables": [],
+            "overdue_invoice_count": 0,
+            "overdue_vendor_payables": [],
         }
         if business_id is None:
             return empty
@@ -80,7 +87,7 @@ def dashboard_summary(database_url: str) -> dict[str, Any]:
             .limit(8)
         ).all()
         active_products = [item for item in products if item.is_active]
-        return {
+        result = {
             "business_name": business.name,
             "orders_total": len(orders),
             "orders_open": sum(
@@ -138,6 +145,78 @@ def dashboard_summary(database_url: str) -> dict[str, Any]:
                 for currency, count, total in currencies
             ],
         }
+        result.update(_dashboard_business_metrics(session, business_id, orders))
+        return result
+
+
+def _dashboard_business_metrics(
+    session: Session, business_id: int, orders: list[Order]
+) -> dict[str, Any]:
+    """Calculate business indicators from persisted records, never display constants."""
+    today = date.today()
+    month_start = today.replace(day=1)
+    current = [order for order in orders if order.order_date >= month_start]
+    eligible = [order for order in orders if order.status != "Cancelled"]
+    fulfilled = [order for order in eligible if order.status == "Fulfilled"]
+    fulfillment_rate = round(len(fulfilled) / len(eligible) * 100, 1) if eligible else None
+
+    trend: dict[tuple[str, str], dict[str, Any]] = {}
+    month_totals: dict[str, dict[str, Any]] = {}
+    for order in orders:
+        month = order.order_date.strftime("%Y-%m")
+        bucket = trend.setdefault(
+            (month, order.currency),
+            {"Month": month, "Currency": order.currency, "Order value": 0.0, "Orders": 0},
+        )
+        bucket["Order value"] += float(order.total)
+        bucket["Orders"] += 1
+        if order.order_date >= month_start:
+            current_bucket = month_totals.setdefault(
+                order.currency,
+                {"Currency": order.currency, "Orders": 0, "Order value": 0.0},
+            )
+            current_bucket["Orders"] += 1
+            current_bucket["Order value"] += float(order.total)
+
+    for bucket in month_totals.values():
+        bucket["Order value"] = round(bucket["Order value"], 2)
+        bucket["Average order value"] = round(
+            bucket["Order value"] / bucket["Orders"], 2
+        ) if bucket["Orders"] else 0.0
+
+    invoices = session.scalars(select(Invoice).where(
+        Invoice.business_id == business_id, Invoice.review_status == "confirmed"
+    )).all()
+    payables: dict[str, float] = {}
+    overdue: dict[str, float] = {}
+    for invoice in invoices:
+        if invoice.total is None or not invoice.currency:
+            continue
+        payables[invoice.currency] = payables.get(invoice.currency, 0.0) + float(invoice.total)
+        if invoice.due_date and invoice.due_date < today:
+            overdue[invoice.currency] = overdue.get(invoice.currency, 0.0) + float(invoice.total)
+
+    return {
+        "orders_this_month": len(current),
+        "fulfillment_rate": fulfillment_rate,
+        "current_month_order_totals": sorted(
+            month_totals.values(), key=lambda row: row["Currency"]
+        ),
+        "monthly_order_trend": sorted(
+            trend.values(), key=lambda row: (row["Month"], row["Currency"])
+        ),
+        "confirmed_vendor_payables": [
+            {"Currency": key, "Amount": round(value, 2)}
+            for key, value in sorted(payables.items())
+        ],
+        "overdue_invoice_count": sum(
+            1 for invoice in invoices if invoice.due_date and invoice.due_date < today
+        ),
+        "overdue_vendor_payables": [
+            {"Currency": key, "Amount": round(value, 2)}
+            for key, value in sorted(overdue.items())
+        ],
+    }
 
 
 def report_data(

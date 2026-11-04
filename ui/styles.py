@@ -8,29 +8,29 @@ def apply_global_styles() -> None:
         """
         <style>
         :root {
-            --bf-navy: #142b45;
-            --bf-blue: #1769c2;
-            --bf-blue-dark: #1055a2;
-            --bf-ink: #172b4d;
-            --bf-muted: #66758a;
-            --bf-border: #e2e8f0;
+            --bf-navy: #ffffff;
+            --bf-blue: #258653;
+            --bf-blue-dark: #176b40;
+            --bf-ink: #172b25;
+            --bf-muted: #718078;
+            --bf-border: #e3eae5;
             --bf-surface: #ffffff;
-            --bf-canvas: #f3f6fa;
+            --bf-canvas: #f7f9f7;
         }
         .stApp { background: var(--bf-canvas); color: var(--bf-ink); }
-        [data-testid="stSidebar"] { background: var(--bf-navy); }
-        [data-testid="stSidebar"] * { color: #f8fafc; }
+        [data-testid="stSidebar"] { background: #ffffff; border-right: 1px solid var(--bf-border); }
+        [data-testid="stSidebar"] * { color: #263a30; }
         [data-testid="stSidebar"] [data-testid="stSelectbox"] div[data-baseweb="select"] {
-            background: #203c5b;
+            background: #ffffff;
         }
         [data-testid="stSidebar"] [aria-current="page"] {
-            background: #24496d;
+            background: #e8f4ec; color: #176b40 !important;
             border-radius: 8px;
             font-weight: 700;
         }
         [data-testid="stSidebar"] a:hover,
         [data-testid="stSidebar"] button:hover {
-            background: #1e405f;
+            background: #f0f6f1;
             border-radius: 8px;
         }
         .block-container { max-width: 1500px; padding-top: 1.6rem; padding-bottom: 3rem; }
