@@ -6,7 +6,12 @@ from sqlalchemy import func, select
 
 from database.demo_data import seed_demo_data
 from database.models import (
-    Business, Invoice, Order, OrderLineItem, Product, StockMovement,
+    Business,
+    Invoice,
+    Order,
+    OrderLineItem,
+    Product,
+    StockMovement,
 )
 from database.session import get_session_factory
 from reporting.dashboard import dashboard_metrics
