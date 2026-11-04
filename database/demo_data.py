@@ -7,8 +7,14 @@ from decimal import Decimal
 from sqlalchemy import select
 
 from database.models import (
-    Business, Invoice, Order, OrderLineItem, ProcessingJob, ProcessingLog,
-    Product, StockMovement,
+    Business,
+    Invoice,
+    Order,
+    OrderLineItem,
+    ProcessingJob,
+    ProcessingLog,
+    Product,
+    StockMovement,
 )
 from database.session import get_session_factory, initialize_database
 
@@ -26,7 +32,6 @@ def seed_demo_data(database_url: str) -> None:
             return
 
         today = date.today()
-        now = datetime.now(UTC)
         business = Business(name="Northstar Office & Tech (Demo)", currency="USD")
         session.add(business)
         session.flush()
@@ -69,7 +74,9 @@ def seed_demo_data(database_url: str) -> None:
             balance = opening
             for movement_index in range(2):
                 delta = 5 + ((index + movement_index * 3) % 8)
-                if movement_index == 1 and balance - delta < 0:
+                if movement_index == 1 and index == 8:
+                    delta = balance
+                elif movement_index == 1 and balance - delta < 0:
                     delta = 1
                 signed = delta if movement_index == 0 else -delta
                 balance += signed
