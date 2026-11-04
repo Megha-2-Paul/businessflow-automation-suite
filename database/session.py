@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from database import models  # noqa: F401 - register ORM models
 from database.base import Base
 
+
 def build_engine(database_url: str) -> Engine:
     """Create a SQLAlchemy engine and prepare local SQLite storage if needed."""
     url = make_url(database_url)
