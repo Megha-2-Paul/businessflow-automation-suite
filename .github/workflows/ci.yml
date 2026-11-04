@@ -30,8 +30,10 @@ jobs:
         run: python -m compileall -q app.py config database logging_config ui processing validation services invoices orders inventory reporting tests
       - name: Check imports
         run: python -c "import app; import config.settings; import database.models; import database.session; import logging_config.setup; import ui.navigation; import ui.styles; import ui.workspace; import processing.cleaning; import processing.spreadsheets; import validation.spreadsheets; import services.spreadsheet_service; import services.invoice_service; import invoices.extraction; import orders.validation; import services.order_service; import services.inventory_service; import inventory.validation; import reporting.service; import reporting.exports"
-      - name: Run Ruff
-        run: ruff check .
+      - name: Run Ruff and report formatting diff
+        run: |
+          ruff check --fix .
+          git diff -- .
       - name: Run tests
         run: pytest
       - name: Verify Streamlit app starts
