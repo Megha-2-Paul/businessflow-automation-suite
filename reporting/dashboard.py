@@ -59,7 +59,8 @@ def dashboard_insights(database_url: str, *, today: date | None = None) -> dict:
             key = order.order_date.strftime("%Y-%m")
             if key in month_keys:
                 monthly_order_counts[key] += 1
-                monthly_revenue[(key, order.currency)] += order.total
+                if order.status != "Cancelled":
+                    monthly_revenue[(key, order.currency)] += order.total
             if order.status != "Cancelled":
                 order_totals[order.currency] += order.total
                 order_counts[order.currency] += 1
