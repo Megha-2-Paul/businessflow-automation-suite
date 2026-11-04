@@ -1,6 +1,6 @@
 """Integration tests for seeded demo records and saved-record dashboard insights."""
 from database.demo_data import seed_demo_dataset
-from database.models import Business, Invoice, Order, Product, ProcessingJob
+from database.models import Business, Invoice, Order, ProcessingJob, Product
 from database.session import get_session_factory
 from reporting.dashboard import dashboard_insights
 
