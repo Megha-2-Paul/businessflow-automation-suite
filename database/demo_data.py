@@ -7,8 +7,15 @@ from decimal import Decimal
 from sqlalchemy import select
 
 from database.models import (
-    Business, Invoice, InvoiceLineItem, Order, OrderLineItem, ProcessingJob,
-    ProcessingLog, Product, StockMovement,
+    Business,
+    Invoice,
+    InvoiceLineItem,
+    Order,
+    OrderLineItem,
+    ProcessingJob,
+    ProcessingLog,
+    Product,
+    StockMovement,
 )
 from database.session import get_session_factory, initialize_database
 
@@ -99,7 +106,7 @@ def seed_demo_dataset(database_url: str) -> None:
                 customer_name=CUSTOMERS[index % len(CUSTOMERS)],
                 customer_email=f"buyer{index + 1}@example.invalid",
                 order_date=order_date, currency=currency, status=status, total=amount,
-                created_at=datetime.combine(order_date, time(10 + index % 8), tzinfo=timezone.utc),
+                created_at=datetime.combine(order_date, time(10 + index % 8), tzinfo=UTC),
             )
             session.add(order)
             session.flush()
