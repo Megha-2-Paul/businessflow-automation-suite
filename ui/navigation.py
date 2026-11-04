@@ -1,5 +1,8 @@
 """Application page registration."""
+from __future__ import annotations
+
 import streamlit as st
+
 
 def build_navigation():
     """Build the application navigation."""
