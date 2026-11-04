@@ -65,7 +65,7 @@ def dashboard_insights(database_url: str, *, today: date | None = None) -> dict:
                 order_totals[order.currency] += order.total
                 order_counts[order.currency] += 1
 
-        eligible_orders = [order for order in orders if order.status != "Cancelled"]
+        eligible_orders = [order for order in orders if order.status not in {"Draft", "Cancelled"}]
         fulfilled_orders = sum(order.status == "Fulfilled" for order in eligible_orders)
         fulfilment_rate = (
             fulfilled_orders / len(eligible_orders) * 100 if eligible_orders else None
