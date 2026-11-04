@@ -5,7 +5,14 @@ from decimal import Decimal
 from sqlalchemy import func, select
 
 from database.demo_data import seed_demo_records
-from database.models import Business, Invoice, Order, Product, ProcessingJob, StockMovement
+from database.models import (
+    Business,
+    Invoice,
+    Order,
+    ProcessingJob,
+    Product,
+    StockMovement,
+)
 from database.session import get_session_factory, initialize_database
 from reporting.dashboard import dashboard_insights
 
