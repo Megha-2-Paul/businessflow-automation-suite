@@ -9,6 +9,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from sqlalchemy.engine import make_url
+from sqlalchemy.exc import ArgumentError
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SUPPORTED_DATABASE_DRIVERS = {"sqlite", "postgresql", "postgresql+psycopg"}
@@ -50,7 +51,7 @@ class Settings:
             raise ValueError("BUSINESSFLOW_DATABASE_URL must not be empty.")
         try:
             parsed_url = make_url(database_url)
-        except (ValueError, TypeError) as exc:
+        except (ArgumentError, ValueError, TypeError) as exc:
             raise ValueError("BUSINESSFLOW_DATABASE_URL is not a valid SQLAlchemy URL.") from exc
         if parsed_url.drivername not in SUPPORTED_DATABASE_DRIVERS:
             raise ValueError(
