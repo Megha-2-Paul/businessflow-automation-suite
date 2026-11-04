@@ -121,10 +121,13 @@ with stock_column:
     else:
         st.info("Add products to see stock levels.")
 with attention_column:
-    if summary["stock_attention"]:
-        st.warning(f"{len(summary['stock_attention'])} product(s) need a reorder review.")
+    attention = pd.DataFrame(summary["stock_levels"])
+    if not attention.empty:
+        attention = attention[attention["Status"] == "Low stock"]
+    if not attention.empty:
+        st.warning(f"{len(attention)} product(s) need a reorder review.")
         st.dataframe(
-            pd.DataFrame(summary["stock_attention"]),
+            attention[["SKU", "Product", "On hand", "Reorder level", "Unit"]],
             use_container_width=True, hide_index=True,
         )
     else:
