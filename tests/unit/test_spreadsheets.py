@@ -15,7 +15,7 @@ from validation.spreadsheets import validate_dataframe
 
 
 def test_load_csv_and_fallback_encoding():
-    csv_data = "name,city\nAndré,Montréal\n".encode("cp1252")
+    csv_data = "name,city\nAndr\u00e9,Montr\u00e9al\n".encode("cp1252")
     frame = load_tabular_file("customers.csv", csv_data, 1024)
     assert frame.to_dict(orient="records") == [{"name": "André", "city": "Montréal"}]
 
