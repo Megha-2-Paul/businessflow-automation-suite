@@ -1,0 +1,13 @@
+sku,product_name,unit,stock_on_hand,reorder_level,supplier
+DEMO-1004,Wireless Headset,unit,31,12,Northstar Office Co.
+DEMO-1005,USB-C Hub,unit,8,10,Brightline Technology
+DEMO-1006,Portable SSD 1TB,unit,26,8,Cedar & Stone Supplies
+DEMO-1007,Webcam 1080p,unit,6,9,Summit Wholesale
+DEMO-1008,Mechanical Keyboard,unit,34,10,Harbor Business Goods
+DEMO-1009,Laptop Sleeve,unit,42,15,Northstar Office Co.
+DEMO-1010,Wireless Presenter,unit,19,8,Brightline Technology
+DEMO-1011,Monitor Light Bar,unit,5,7,Cedar & Stone Supplies
+DEMO-1012,Desk Mat,unit,28,12,Summit Wholesale
+DEMO-1013,USB Microphone,unit,14,6,Harbor Business Goods
+DEMO-1014,Ergonomic Mouse Pad,unit,3,10,Northstar Office Co.
+DEMO-1015,Laptop Riser,unit,22,8,Brightline Technology
