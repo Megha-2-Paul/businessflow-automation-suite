@@ -48,7 +48,7 @@ def test_create_update_and_transition_order(tmp_path):
         assert session.query(OrderLineItem).count() == 1
         assert session.query(ProcessingJob).filter_by(
             job_type="order_management"
-        ).count() == 3
+        ).count() == 4
 
 
 def test_duplicate_number_and_invalid_transition(tmp_path):
