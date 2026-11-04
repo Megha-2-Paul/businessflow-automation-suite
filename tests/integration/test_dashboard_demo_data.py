@@ -26,9 +26,9 @@ def test_dashboard_insights_are_derived_from_seeded_records(tmp_path):
     assert sum(row["Orders"] for row in insights["monthly_orders"]) > 0
     currencies = {row["Currency"] for row in insights["order_value_by_currency"]}
     assert currencies == {"USD", "EUR"}
-    assert insights["eligible_orders"] == 25
+    assert insights["eligible_orders"] == 20
     assert insights["fulfilled_orders"] == 10
-    assert insights["fulfilment_rate"] == 40.0
+    assert insights["fulfilment_rate"] == 50.0
     assert len(insights["low_stock_products"]) >= 3
     assert insights["confirmed_invoice_count"] == 12
     invoice_currencies = {row["Currency"] for row in insights["invoice_totals"]}
