@@ -1,6 +1,7 @@
 """Interactive spreadsheet cleaning, validation and consolidation workspace."""
 from __future__ import annotations
 
+import hashlib
 import re
 
 import streamlit as st
@@ -53,6 +54,24 @@ with clean_tab:
                 sheet_name = st.selectbox("Worksheet", sheet_names)
         except SpreadsheetError as exc:
             st.error(str(exc))
+
+    if uploaded is not None:
+        fingerprint = hashlib.sha256(
+            f"{uploaded.name}:{sheet_name}".encode() + uploaded.getvalue()
+        ).hexdigest()
+        if st.session_state.get("bf_clean_upload_fingerprint") != fingerprint:
+            for key in (
+                "bf_source_frame", "bf_source_name", "bf_clean_frame",
+                "bf_clean_summary", "bf_clean_issues", "bf_clean_job_id",
+            ):
+                st.session_state.pop(key, None)
+            st.session_state["bf_clean_upload_fingerprint"] = fingerprint
+    elif st.session_state.pop("bf_clean_upload_fingerprint", None) is not None:
+        for key in (
+            "bf_source_frame", "bf_source_name", "bf_clean_frame",
+            "bf_clean_summary", "bf_clean_issues", "bf_clean_job_id",
+        ):
+            st.session_state.pop(key, None)
 
     if uploaded is not None and st.button("Load and inspect", key="load_spreadsheet"):
         try:
@@ -154,6 +173,24 @@ with combine_tab:
         key="spreadsheet_combine_uploads",
         help=f"Each file must be no larger than {settings.max_upload_mb} MB.",
     )
+    if uploads:
+        digest = hashlib.sha256()
+        for file in uploads:
+            digest.update(file.name.encode())
+            digest.update(file.getvalue())
+        fingerprint = digest.hexdigest()
+        if st.session_state.get("bf_combine_upload_fingerprint") != fingerprint:
+            for key in (
+                "bf_combined_frame", "bf_combined_summary", "bf_combined_job_id",
+            ):
+                st.session_state.pop(key, None)
+            st.session_state["bf_combine_upload_fingerprint"] = fingerprint
+    elif st.session_state.pop("bf_combine_upload_fingerprint", None) is not None:
+        for key in (
+            "bf_combined_frame", "bf_combined_summary", "bf_combined_job_id",
+        ):
+            st.session_state.pop(key, None)
+
     if uploads and st.button("Combine files", type="primary", key="combine_spreadsheets"):
         try:
             frames = [
