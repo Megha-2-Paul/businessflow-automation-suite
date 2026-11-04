@@ -1,5 +1,6 @@
 """Integration coverage for dashboard summaries, reports and exports."""
 from datetime import date, timedelta
+from io import BytesIO
 
 import pandas as pd
 import pytest
@@ -97,7 +98,7 @@ def test_history_filters_logs_and_errors(tmp_path):
     assert len(jobs) == 1
     assert jobs[0]["logs"][0]["message"] == "Cleaned input."
     assert jobs[0]["errors"][0]["details"] == "Amount is invalid."
-    assert processing_history(url, workflow="inventory_management") == []
+    assert processing_history(url, workflow="spreadsheet_consolidation") == []
 
 
 def test_exports_are_readable_and_formula_text_is_neutralised(tmp_path):
@@ -106,7 +107,7 @@ def test_exports_are_readable_and_formula_text_is_neutralised(tmp_path):
     frame.loc[0, "Customer"] = "=HYPERLINK(\"https://example.invalid\")"
     csv_data = export_csv(frame)
     assert b"'=HYPERLINK" in csv_data
-    workbook = pd.ExcelFile(export_xlsx(frame))
+    workbook = pd.ExcelFile(BytesIO(export_xlsx(frame)))
     assert workbook.sheet_names == ["Report"]
     with pytest.raises(ValueError, match="Start date"):
         report_data(
