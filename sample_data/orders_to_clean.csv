@@ -1,0 +1,7 @@
+order_id, customer_name ,order_date,amount,status
+BF-5001,Northstar Studio,2026-10-02,249.99,Confirmed
+BF-5002,Cedar & Co.,2026-10-05,89.50,Fulfilled
+BF-5002,Cedar & Co.,2026-10-05,89.50,Fulfilled
+BF-5003,Brightline Design,2026-10-09,invalid,Processing
+BF-5004,Maple Works,2026-10-12,159.00,Confirmed
+BF-5005,,2026-10-14,74.25,Draft
