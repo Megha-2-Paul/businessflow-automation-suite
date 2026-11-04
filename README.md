@@ -33,7 +33,9 @@ and a transactional SQLAlchemy persistence layer.
 - Prevent negative stock and block stale stocktake reconciliation.
 
 ### Dashboard, reporting and traceability
-- Review current-month order value, order count, average order value, fulfilment rate and low-stock KPIs, with previous-month comparisons where applicable.\n- Analyse six-month order activity and order-value trends, order-status mix and inventory health.\n- Keep currencies separate in order-value reporting; order value is not represented as collected revenue because payment settlement is not tracked.
+- Review current-month order value in the business currency, active order count across currencies, average order value, fulfilment rate and low-stock KPIs, with previous-month comparisons.
+- Analyse six-month order activity and order-value trends, order-status mix and inventory health.
+- Keep currencies separate in order-value reporting; order value is not represented as collected revenue because payment settlement is not tracked.
 - Analyse order status and current stock position from persisted records.
 - View order values grouped by currency; currencies are never combined.
 - Export orders, invoices, inventory, stock movements and processing activity
@@ -44,11 +46,17 @@ and a transactional SQLAlchemy persistence layer.
 ## Demonstration workspace
 
 The sidebar includes a separate Demo workspace backed by
-`data/businessflow-demo.db`. The first selection creates a repeatable fictional dataset with a product catalogue, customer orders across several months, invoice records, stock movements and processing activity. The seeder records its version and does not duplicate records on reruns.
+`data/businessflow-demo.db`. A fresh demo workspace creates 12 fictional
+products, 29 customer orders across several months, 19 invoices, stock
+movements and processing activity. The catalogue includes both healthy and
+low-stock examples. The versioned seeder is repeatable and does not duplicate
+records on reruns.
+
 The demo database is separate from the configured live database; switching
 workspaces changes which database the UI reads and writes. Demo records are
-local examples, not customer results. Remove the demo database file to reset
-the demonstration dataset; it will be recreated on the next selection.
+local examples, not customer results. To reset an older or modified demo
+workspace, remove only `data/businessflow-demo.db`; it will be recreated with
+the current demonstration dataset on the next selection.
 
 ## Technology
 
