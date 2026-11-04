@@ -33,7 +33,7 @@ and a transactional SQLAlchemy persistence layer.
 - Prevent negative stock and block stale stocktake reconciliation.
 
 ### Dashboard, reporting and traceability
-- Review period-based order KPIs, order trends, order-status distribution, stock health, low-stock items and confirmed invoice values on the dashboard. KPIs and charts are calculated from saved workspace records; order values remain separated by currency.
+- Review period-based order KPIs, order trends, order-status distribution, stock health, low-stock items and confirmed invoice values on the dashboard. KPIs and charts are calculated from saved workspace records; committed order value excludes drafts and cancellations, and currency totals remain separate.
 - Analyse order status and current stock position from persisted records.
 - View order values grouped by currency; currencies are never combined.
 - Export orders, invoices, inventory, stock movements and processing activity
