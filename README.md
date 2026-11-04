@@ -19,6 +19,8 @@ inventory, and generate operational reports.
 - Extract selectable text from PDF invoices and identify candidate invoice fields.
 - Review and edit invoice details and line items before explicit confirmation.
 - Persist confirmed invoice records, line items and processing history in SQLite.
+- Create and manage customer orders with multiple line items, exact decimal totals, duplicate-number protection and controlled status transitions.
+- Search and filter orders, edit draft orders and record order activity in processing history.
 - Do not retain the original invoice PDF or extracted full text by default.
 - Neutralise spreadsheet formula-like text in exported files.
 
@@ -69,6 +71,7 @@ implemented in later phases after the core workflows are stable.
 - Spreadsheet support is CSV and XLSX; Excel consolidation uses the first worksheet.
 - Spreadsheet validation is generic and does not infer business-specific rules.
 - Spreadsheet processing is limited to 250,000 rows and 200 columns per file.
+- Orders support manual entry and draft editing; stock is not reserved or deducted until the inventory phase.
 - Invoice extraction supports selectable-text PDFs only; OCR and complex layouts are deferred.
 - Invoice field extraction is heuristic and requires human verification.
 - The current UI uses the first configured business workspace; multi-tenant selection is not yet available.

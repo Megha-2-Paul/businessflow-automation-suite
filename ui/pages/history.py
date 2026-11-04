@@ -16,7 +16,7 @@ with factory() as session:
         .join(Business)
         .where(
             ProcessingJob.job_type.in_(
-                ["spreadsheet_clean", "spreadsheet_consolidation", "invoice_extraction"]
+                ["spreadsheet_clean", "spreadsheet_consolidation", "invoice_extraction", "order_management"]
             )
         )
         .order_by(ProcessingJob.created_at.desc())

@@ -44,6 +44,7 @@ class Business(Base):
     dataset_sources: Mapped[list[DatasetSource]] = relationship(back_populates="business")
     processing_jobs: Mapped[list[ProcessingJob]] = relationship(back_populates="business")
     invoices: Mapped[list[Invoice]] = relationship(back_populates="business")
+    orders: Mapped[list[Order]] = relationship(back_populates="business")
 
 
 class DatasetSource(Base):
@@ -229,3 +230,56 @@ class InvoiceLineItem(Base):
     amount: Mapped[Decimal | None] = mapped_column(Numeric(14, 2))
 
     invoice: Mapped[Invoice] = relationship(back_populates="line_items")
+
+class Order(Base):
+    """Customer order with a controlled lifecycle and calculated total."""
+
+    __tablename__ = "orders"
+    __table_args__ = (
+        UniqueConstraint("business_id", "order_number", name="uq_order_business_number"),
+        CheckConstraint(
+            "status IN ('Draft', 'Confirmed', 'Processing', 'Fulfilled', 'Cancelled')",
+            name="ck_order_status",
+        ),
+        CheckConstraint("length(order_number) > 0", name="ck_order_number_not_empty"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    business_id: Mapped[int] = mapped_column(
+        ForeignKey("businesses.id", ondelete="CASCADE"), nullable=False
+    )
+    order_number: Mapped[str] = mapped_column(String(120), nullable=False)
+    customer_name: Mapped[str] = mapped_column(String(200), nullable=False)
+    customer_email: Mapped[str | None] = mapped_column(String(254))
+    order_date: Mapped[date] = mapped_column(Date, nullable=False, default=date.today)
+    currency: Mapped[str] = mapped_column(String(3), nullable=False, default="USD")
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="Draft")
+    total: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False, default=Decimal("0"))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False
+    )
+
+    business: Mapped[Business] = relationship(back_populates="orders")
+    line_items: Mapped[list[OrderLineItem]] = relationship(
+        back_populates="order", cascade="all, delete-orphan"
+    )
+
+
+class OrderLineItem(Base):
+    """A product or service included in an order."""
+
+    __tablename__ = "order_line_items"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    order_id: Mapped[int] = mapped_column(
+        ForeignKey("orders.id", ondelete="CASCADE"), nullable=False
+    )
+    description: Mapped[str] = mapped_column(String(500), nullable=False)
+    quantity: Mapped[Decimal] = mapped_column(Numeric(14, 3), nullable=False)
+    unit_price: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False)
+    amount: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False)
+
+    order: Mapped[Order] = relationship(back_populates="line_items")
