@@ -16,16 +16,16 @@ def test_demo_workspace_seeds_isolated_sample_records(tmp_path):
     factory = get_session_factory(database_url)
     with factory() as session:
         assert session.scalar(select(func.count(Business.id))) == 1
-        assert session.scalar(select(func.count(Product.id))) == 3
-        assert session.scalar(select(func.count(Order.id))) == 1
-        assert session.scalar(select(func.count(Invoice.id))) == 1
+        assert session.scalar(select(func.count(Product.id))) == 12
+        assert session.scalar(select(func.count(Order.id))) == 29
+        assert session.scalar(select(func.count(Invoice.id))) == 19
 
     summary = dashboard_summary(database_url)
     assert summary["business_name"] == "Demo Business"
-    assert summary["orders_total"] == 1
-    assert summary["invoices_confirmed"] == 1
-    assert summary["products_active"] == 3
-    assert summary["products_low_stock"] == 1
+    assert summary["orders_total"] == 29
+    assert summary["invoices_confirmed"] == 19
+    assert summary["products_active"] == 12
+    assert summary["products_low_stock"] == 2
 
 
 def test_demo_workspace_preserves_existing_database_records(tmp_path):

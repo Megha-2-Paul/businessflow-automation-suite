@@ -33,7 +33,9 @@ and a transactional SQLAlchemy persistence layer.
 - Prevent negative stock and block stale stocktake reconciliation.
 
 ### Dashboard, reporting and traceability
-- Review live order, invoice, product and low-stock counts on the dashboard.
+- Review current-month order value in the business currency, active order count across currencies, average order value, fulfilment rate and low-stock KPIs, with previous-month comparisons.
+- Analyse six-month order activity and order-value trends, order-status mix and inventory health.
+- Keep currencies separate in order-value reporting; order value is not represented as collected revenue because payment settlement is not tracked.
 - Analyse order status and current stock position from persisted records.
 - View order values grouped by currency; currencies are never combined.
 - Export orders, invoices, inventory, stock movements and processing activity
@@ -44,12 +46,17 @@ and a transactional SQLAlchemy persistence layer.
 ## Demonstration workspace
 
 The sidebar includes a separate Demo workspace backed by
-`data/businessflow-demo.db`. The first selection creates clearly fictional
-sample products, stock balances, an order, an invoice and processing activity.
+`data/businessflow-demo.db`. A fresh demo workspace creates 12 fictional
+products, 29 customer orders across several months, 19 invoices, stock
+movements and processing activity. The catalogue includes both healthy and
+low-stock examples. The versioned seeder is repeatable and does not duplicate
+records on reruns.
+
 The demo database is separate from the configured live database; switching
 workspaces changes which database the UI reads and writes. Demo records are
-local examples, not customer results. Remove the demo database file to reset
-the demonstration dataset; it will be recreated on the next selection.
+local examples, not customer results. To reset an older or modified demo
+workspace, remove only `data/businessflow-demo.db`; it will be recreated with
+the current demonstration dataset on the next selection.
 
 ## Technology
 
@@ -72,11 +79,7 @@ Run checks with pytest, ruff check . and the compile command in docs/setup.md.
 See .env.example. Upload size is controlled by BUSINESSFLOW_MAX_UPLOAD_MB.
 Do not commit .env, local databases, uploads or private business data.
 
-No customer records, synthetic stock balances or fabricated business outcomes
-are bundled. Inventory starts at zero unless a user enters a real opening
-balance. Dashboard figures and reports are computed from saved workspace data.
-Public datasets may be downloaded separately after reviewing licence,
-attribution and privacy conditions. See data/README.md.
+The Demo workspace contains fictional sample records for safe product walkthroughs. CSV examples for spreadsheet cleaning and validation are in `sample_data/`. The Live workspace starts with no synthetic business records; dashboard figures and reports are computed from records saved in the selected workspace. Public datasets may be downloaded separately after reviewing licence, attribution and privacy conditions. See data/README.md.
 
 ## Architecture
 

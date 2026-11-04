@@ -1,111 +1,260 @@
-"""Live operational dashboard for the selected business workspace."""
-from __future__ import annotations
-
+"""Decision-focused dashboard for the selected business workspace."""
 import pandas as pd
 import plotly.express as px
 import streamlit as st
 
 from config.settings import get_settings
-from reporting.service import dashboard_summary
+from reporting.dashboard import dashboard_insights
 from ui.workspace import get_database_url
 
-settings = get_settings()
-demo_mode = st.session_state.get("bf_workspace_mode") == "Demo"
-summary = dashboard_summary(get_database_url(settings.database_url))
 
-st.markdown('<div class="bf-page-eyebrow">BUSINESS OPERATIONS</div>', unsafe_allow_html=True)
+def _style_chart(fig, *, height: int = 330) -> None:
+    """Apply consistent typography, spacing and grid styling to Plotly charts."""
+    fig.update_layout(
+        height=height,
+        margin={"l": 12, "r": 12, "t": 24, "b": 12},
+        plot_bgcolor="#ffffff",
+        paper_bgcolor="#ffffff",
+        font={"color": "#435349", "size": 12},
+        hoverlabel={"bgcolor": "#ffffff", "font_color": "#172b25"},
+        legend={"bgcolor": "rgba(255,255,255,0)", "font": {"color": "#435349"}},
+    )
+    fig.update_xaxes(showgrid=False, automargin=True)
+    fig.update_yaxes(
+        gridcolor="#edf1ed",
+        zerolinecolor="#dfe7e0",
+        rangemode="tozero",
+        automargin=True,
+    )
+
+
+settings = get_settings()
+database_url = get_database_url(settings.database_url)
+demo_mode = st.session_state.get("bf_workspace_mode") == "Demo"
+data = dashboard_insights(database_url)
+kpis = data["kpis"]
+currency = data["currency"]
+
+st.markdown(
+    '<div class="bf-page-eyebrow">BUSINESS PERFORMANCE</div>',
+    unsafe_allow_html=True,
+)
 st.title("Business overview")
 st.caption(
-    f"Operational snapshot · {summary['business_name']} · "
-    "Figures are calculated from records saved in the selected workspace."
+    f"{data['business_name']} · A live view of saved orders, fulfilment and stock."
 )
+
 if demo_mode:
     st.info(
-        "Demo workspace: all records shown here are fictional examples stored "
-        "separately from your live business database."
+        "DEMO DATA · Fictional business records for product demonstration. "
+        "Switch to Live workspace to see your own saved records."
+    )
+else:
+    st.caption(
+        "Live workspace · Figures below are calculated from records saved "
+        "in your configured database."
     )
 
-metric_columns = st.columns(5)
+st.subheader("This month's performance")
+st.caption(
+    f"Order activity for {data.get('period_label', 'the current month')}. "
+    f"Order values and average order value are shown in {currency}; "
+    "these figures are not collected revenue."
+)
 metrics = [
-    ("Total orders", summary["orders_total"]),
-    ("Open orders", summary["orders_open"]),
-    ("Awaiting fulfilment", summary["orders_awaiting_fulfilment"]),
-    ("Confirmed invoices", summary["invoices_confirmed"]),
-    ("Active products", summary["products_active"]),
+    (
+        "Order value",
+        f"{currency} {kpis['order_value']:,.2f}",
+        f"{kpis['order_value_change']:+,.2f} vs prior month",
+        "Confirmed, processing and fulfilled orders in the business currency.",
+    ),
+    (
+        "Orders",
+        f"{kpis['orders']:,}",
+        f"{kpis['orders_change']:+,} vs prior month",
+        "Active orders across all currencies; drafts and cancelled orders excluded.",
+    ),
+    (
+        "Average order",
+        f"{currency} {kpis['average_order']:,.2f}",
+        "Current month · selected currency",
+        "Average value of active orders denominated in the business currency.",
+    ),
+    (
+        "Fulfilment rate",
+        f"{kpis['fulfillment_rate']:.1f}%",
+        f"{kpis['fulfilled_orders']} of {kpis['eligible_orders']} active orders",
+        "Fulfilled orders divided by confirmed, processing and fulfilled orders.",
+    ),
+    (
+        "Low-stock items",
+        f"{kpis['low_stock']:,}",
+        f"of {kpis['active_products']} active products",
+        "Products at or below their configured reorder level.",
+    ),
 ]
-for column, (label, value) in zip(metric_columns, metrics):
-    column.metric(label, f"{value:,}")
+for start in (0, 3):
+    row = st.columns(3 if start == 0 else 2)
+    for column, metric in zip(row, metrics[start : start + len(row)]):
+        label, value, delta, help_text = metric
+        column.metric(label, value, delta, help=help_text)
 
-low_stock = summary["products_low_stock"]
-if low_stock:
+if kpis["low_stock"]:
     st.warning(
-        f"{low_stock} active product(s) are at or below their reorder level. "
-        "Review Inventory Management."
+        f"{kpis['low_stock']} active products are at or below their reorder "
+        "level. Review the inventory list before accepting more orders."
     )
 else:
-    st.success("No active products are currently at or below their reorder level.")
+    st.success("All active products are currently above their reorder levels.")
 
-left, right = st.columns([1.15, 1])
+trend = pd.DataFrame(data["monthly_trend"])
+st.divider()
+st.subheader("Sales and order trends")
+st.caption(
+    "Order counts include all currencies. Order values include only the "
+    f"selected business currency ({currency}) and are not collected revenue."
+)
+left, right = st.columns(2)
 with left:
-    st.subheader("Order status")
-    if summary["order_statuses"]:
-        status_frame = pd.DataFrame(summary["order_statuses"])
-        chart = px.bar(
-            status_frame, x="Status", y="Orders", text_auto=True,
-            color="Orders", color_continuous_scale=["#bfdbfe", "#1769c2"],
+    st.markdown("**Order activity · last 6 months**")
+    if not trend.empty:
+        fig = px.bar(
+            trend,
+            x="Month",
+            y="Orders",
+            text_auto=True,
+            labels={"Month": "Month", "Orders": "Orders"},
         )
-        chart.update_layout(
-            height=320, margin=dict(l=12, r=12, t=20, b=12),
-            plot_bgcolor="white", paper_bgcolor="white",
-            coloraxis_showscale=False, xaxis_title=None, yaxis_title="Orders",
+        fig.update_traces(
+            marker_color="#72b987",
+            marker_line_width=0,
+            textposition="outside",
+            cliponaxis=False,
+            hovertemplate="%{x}<br>%{y} orders<extra></extra>",
         )
-        st.plotly_chart(chart, use_container_width=True)
+        _style_chart(fig)
+        st.plotly_chart(fig, use_container_width=True)
     else:
-        st.info("Order status analysis will appear after orders are saved.")
+        st.info("Order activity will appear after orders are recorded.")
+
 with right:
-    st.subheader("Order value by currency")
-    st.caption("Currencies are kept separate and are never added together.")
-    if summary["currency_totals"]:
-        st.dataframe(summary["currency_totals"], use_container_width=True, hide_index=True)
+    st.markdown(f"**Order value · {currency}**")
+    if not trend.empty and trend["Order value"].sum() > 0:
+        fig = px.area(
+            trend,
+            x="Month",
+            y="Order value",
+            labels={"Month": "Month", "Order value": f"Order value ({currency})"},
+        )
+        fig.update_traces(
+            line={"color": "#23845b", "width": 3},
+            fillcolor="rgba(115,185,135,.18)",
+            hovertemplate="%{x}<br>%{y:,.2f} " + currency + "<extra></extra>",
+        )
+        _style_chart(fig)
+        st.plotly_chart(fig, use_container_width=True)
     else:
-        st.info("No order values are available yet.")
+        st.info(
+            f"Order value trend will appear when active {currency} orders exist."
+        )
 
-st.subheader("Inventory position")
-if summary["stock_levels"]:
+st.divider()
+st.subheader("Operations snapshot")
+left, right = st.columns([0.9, 1.35])
+with left:
+    st.markdown("**Orders by status**")
+    st.caption("Draft orders are included; cancelled orders are excluded.")
+    status = pd.DataFrame(data["status_mix"])
+    if not status.empty:
+        fig = px.pie(
+            status,
+            names="Status",
+            values="Orders",
+            hole=0.62,
+            color_discrete_sequence=[
+                "#23845b",
+                "#83bd98",
+                "#a9d6b5",
+                "#d4e2d7",
+                "#5b9b78",
+            ],
+        )
+        fig.update_layout(
+            height=330,
+            margin={"l": 8, "r": 8, "t": 18, "b": 8},
+            paper_bgcolor="#ffffff",
+            font={"color": "#435349", "size": 12},
+            legend_title_text="",
+            legend={"orientation": "h", "y": -0.08},
+        )
+        fig.update_traces(
+            textposition="inside",
+            textinfo="percent",
+            hovertemplate="%{label}: %{value} orders (%{percent})<extra></extra>",
+        )
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.info("Status distribution will appear after orders are saved.")
+
+with right:
+    st.markdown("**Inventory health**")
+    st.caption("Products closest to or below their configured reorder level.")
+    inventory = pd.DataFrame(data["inventory"])
+    if not inventory.empty:
+        st.dataframe(
+            inventory,
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                "On hand": st.column_config.NumberColumn(format="%.3f"),
+                "Reorder level": st.column_config.NumberColumn(format="%.3f"),
+            },
+        )
+    else:
+        st.info("Add products to start monitoring stock levels.")
+
+st.divider()
+st.subheader("Order value by currency")
+st.caption(
+    "Currencies are reported separately. Active orders only; "
+    "draft and cancelled orders are excluded."
+)
+if data["currency_totals"]:
     st.dataframe(
-        pd.DataFrame(summary["stock_levels"]),
-        use_container_width=True, hide_index=True,
+        pd.DataFrame(data["currency_totals"]),
+        use_container_width=True,
+        hide_index=True,
     )
 else:
-    st.info(
-        "No products have been added. Add catalogue items and opening balances "
-        "in Inventory Management."
-    )
+    st.info("No active order values are available yet.")
 
-st.subheader("Recent processing activity")
-if summary["recent_jobs"]:
-    st.dataframe(
-        pd.DataFrame(summary["recent_jobs"]),
-        use_container_width=True, hide_index=True,
-    )
-else:
-    st.info(
-        "No workflow activity has been recorded yet. Process a spreadsheet, "
-        "confirm an invoice, or update an order or product to begin building history."
-    )
+st.subheader("Invoice processing")
+invoice = data["invoice_summary"]
+invoice_columns = st.columns(3)
+invoice_columns[0].metric("Invoices saved", invoice["total"])
+invoice_columns[1].metric("Confirmed invoices", invoice["confirmed"])
+other_review_statuses = invoice["total"] - invoice["confirmed"]
+invoice_columns[2].metric("Other review statuses", other_review_statuses)
+st.caption(
+    "Counts reflect saved invoice review records. Payment status and "
+    "accounts-receivable balances are not tracked by this application."
+)
 
 st.divider()
 st.subheader("Continue working")
 nav_left, nav_middle, nav_right = st.columns(3)
 nav_left.page_link(
-    "ui/pages/data_workbench.py", label="Process spreadsheets",
+    "ui/pages/data_workbench.py",
+    label="Process spreadsheets",
     icon=":material/table_view:",
 )
 nav_middle.page_link(
-    "ui/pages/invoices.py", label="Review invoices",
+    "ui/pages/invoices.py",
+    label="Review invoices",
     icon=":material/receipt_long:",
 )
 nav_right.page_link(
-    "ui/pages/inventory.py", label="Manage inventory",
+    "ui/pages/inventory.py",
+    label="Manage inventory",
     icon=":material/inventory_2:",
 )
