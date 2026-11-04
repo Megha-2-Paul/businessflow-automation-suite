@@ -1,17 +1,20 @@
-"""Initial BusinessFlow overview page."""
+"""BusinessFlow workspace overview."""
 import streamlit as st
 
 st.title("BusinessFlow Automation Suite")
-st.caption("Automate repetitive business operations with Python.")
-st.info(
-    "Your workspace is ready. Connect a public dataset or upload business data "
-    "when the file automation module is available."
+st.caption("A practical workspace for everyday business data operations.")
+
+st.subheader("Spreadsheet workflows")
+st.write(
+    "Upload CSV and Excel files to inspect data quality, clean common issues, "
+    "combine files and export the results."
 )
-st.subheader("Workspace status")
-left, right = st.columns(2)
-with left:
-    st.markdown("**Data processing**")
-    st.write("File automation is planned for the next development phase.")
-with right:
-    st.markdown("**Business workflows**")
-    st.write("Invoice, order and inventory modules will be added in their approved phases.")
+st.page_link("ui/pages/data_workbench.py", label="Open Data Workbench")
+st.page_link("ui/pages/history.py", label="View processing history")
+
+st.divider()
+st.subheader("Coming in later phases")
+st.write(
+    "Invoice extraction, order management, inventory reconciliation and "
+    "operational reporting are planned for later development phases."
+)
