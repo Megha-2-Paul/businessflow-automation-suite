@@ -92,7 +92,6 @@ def dashboard_metrics(database_url: str, period_days: int = 30) -> dict[str, Any
         currency_rows = []
         for currency in sorted(values):
             count = sum(order.currency == currency for order in current_orders)
-            previous_count = sum(order.currency == currency for order in previous_orders)
             total = values[currency]
             previous_total = previous_values[currency]
             currency_rows.append({
