@@ -10,7 +10,6 @@ from sqlalchemy import select
 from database.models import Business, Invoice, Order, Product
 from database.session import get_session_factory
 
-
 ACTIVE_ORDER_STATUSES = {"Confirmed", "Processing", "Fulfilled"}
 
 
