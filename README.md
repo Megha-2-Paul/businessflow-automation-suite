@@ -44,8 +44,11 @@ and a transactional SQLAlchemy persistence layer.
 ## Demonstration workspace
 
 The sidebar includes a separate Demo workspace backed by
-`data/businessflow-demo.db`. The first selection creates clearly fictional
-sample products, stock balances, an order, an invoice and processing activity.
+`data/businessflow-demo.db`. The first selection creates clearly fictional sample products, stock balances,
+orders across multiple months and currencies, supplier invoices with due dates,
+and processing activity. An additional versioned seed adds records to an existing
+older demo database without overwriting its current records. The dataset is
+synthetic, repeatable and separate from the live database.
 The demo database is separate from the configured live database; switching
 workspaces changes which database the UI reads and writes. Demo records are
 local examples, not customer results. Remove the demo database file to reset
@@ -74,7 +77,11 @@ Do not commit .env, local databases, uploads or private business data.
 
 No customer records, synthetic stock balances or fabricated business outcomes
 are bundled. Inventory starts at zero unless a user enters a real opening
-balance. Dashboard figures and reports are computed from saved workspace data.
+balance. Dashboard figures and reports are computed from saved workspace data. The overview
+shows monthly order value by currency, order status, fulfilment rate, supplier
+invoice liabilities and overdue invoices, low-stock alerts, and processing
+activity. Order value is not represented as collected revenue because payment
+records are not currently tracked. Sample spreadsheet inputs are in `sample_data/`.
 Public datasets may be downloaded separately after reviewing licence,
 attribution and privacy conditions. See data/README.md.
 
