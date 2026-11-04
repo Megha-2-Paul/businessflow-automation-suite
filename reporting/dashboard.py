@@ -9,7 +9,7 @@ from typing import Any
 from sqlalchemy import select
 
 from database.models import Business, Invoice, Order, Product
-from database.session import get_session_factory
+from database.session import get_session_factory, initialize_database
 
 
 def dashboard_metrics(database_url: str, period_days: int = 30) -> dict[str, Any]:
@@ -20,6 +20,7 @@ def dashboard_metrics(database_url: str, period_days: int = 30) -> dict[str, Any
     """
     if period_days not in {30, 90, 365}:
         raise ValueError("Dashboard period must be 30, 90 or 365 days.")
+    initialize_database(database_url)
 
     today = date.today()
     start = today - timedelta(days=period_days - 1)
