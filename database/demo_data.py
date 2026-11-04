@@ -175,7 +175,7 @@ def seed_demo_records(database_url: str, *, today: date | None = None) -> None:
             job = ProcessingJob(
                 business_id=business.id, job_type=job_type,
                 status="completed_with_errors" if failed else "completed",
-                records_processed=24 + index, records_succeeded=23 + index - failed,
+                records_processed=24 + index, records_succeeded=24 + index - failed,
                 records_failed=failed, started_at=completed, completed_at=completed,
                 created_at=completed,
             )
