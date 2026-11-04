@@ -10,10 +10,10 @@ exposed through an API without rewriting processing logic.
 
 1. Streamlit pages collect user input.
 2. Application services coordinate a workflow.
-3. Processing and domain modules validate and transform data.
-4. Repository functions persist records through SQLAlchemy.
-5. Reporting services create downloadable outputs.
-6. Processing jobs, logs, and errors provide traceability.
+3. Processing, inventory and domain modules validate and transform data.
+4. SQLAlchemy persists records through transactional service operations.
+5. Reporting services will create downloadable outputs in a later phase.
+6. Processing jobs and logs provide workflow traceability.
 
 ## Technology
 
@@ -23,8 +23,22 @@ Pydantic, Plotly, PyMuPDF, Pytest and Ruff.
 ## Persistence
 
 SQLite is the initial local database. SQLAlchemy models and repository boundaries
-keep the persistence layer portable to PostgreSQL. Database schema changes will
-be managed through migrations when domain modules are introduced.
+keep the persistence layer portable to PostgreSQL. initialize_database
+creates missing tables and currently applies one additive compatibility change
+for optional product links on existing order lines. A formal migration framework
+remains a planned improvement before larger schema changes.
+
+Inventory quantities use three-decimal fixed precision. Each stock change adds
+an immutable StockMovement record with its delta and resulting balance.
+Product balances are updated in the same transaction as the ledger entry.
+Physical counts retain the recorded and counted quantities; reconciliation
+requires an explicit action and is rejected if the product balance changed
+after the count snapshot was taken.
+
+Order fulfilment and inventory deductions share one database transaction.
+Only order lines explicitly linked to an active catalogue product deduct stock.
+A unique (order_id, product_id) ledger constraint provides an additional
+duplicate-deduction safeguard. Freeform order lines remain non-stock lines.
 
 ## Public data governance
 

@@ -21,6 +21,7 @@ with factory() as session:
                     "spreadsheet_consolidation",
                     "invoice_extraction",
                     "order_management",
+                    "inventory_management",
                 ]
             )
         )

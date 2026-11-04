@@ -5,7 +5,7 @@ from collections.abc import Iterator
 from functools import lru_cache
 from pathlib import Path
 
-from sqlalchemy import Engine, create_engine, event
+from sqlalchemy import Engine, create_engine, event, inspect, text
 from sqlalchemy.orm import Session, sessionmaker
 
 from database import models  # noqa: F401 - register ORM models
@@ -57,4 +57,12 @@ def get_session(database_url: str) -> Iterator[Session]:
 
 def initialize_database(database_url: str) -> None:
     """Create missing database tables."""
-    Base.metadata.create_all(get_engine(database_url))
+    engine = get_engine(database_url)
+    Base.metadata.create_all(engine)
+    columns = {column["name"] for column in inspect(engine).get_columns("order_line_items")}
+    if "product_id" not in columns:
+        with engine.begin() as connection:
+            connection.execute(text(
+                "ALTER TABLE order_line_items ADD COLUMN product_id INTEGER "
+                "REFERENCES products(id) ON DELETE RESTRICT"
+            ))

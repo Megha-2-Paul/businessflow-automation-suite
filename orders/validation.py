@@ -40,10 +40,21 @@ def clean_line_items(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
             raise OrderValidationError(f"Line {index} description is required.")
         qty = quantity(item.get("quantity"), f"Line {index} quantity")
         price = money(item.get("unit_price"), f"Line {index} unit price")
+        product_id = item.get("product_id")
+        if product_id in ("", None, 0, "0"):
+            product_id = None
+        else:
+            try:
+                product_id = int(product_id)
+            except (TypeError, ValueError) as exc:
+                raise OrderValidationError(f"Line {index} product selection is invalid.") from exc
+            if product_id <= 0:
+                raise OrderValidationError(f"Line {index} product selection is invalid.")
         cleaned.append({
             "description": description[:500],
             "quantity": qty,
             "unit_price": price,
             "amount": (qty * price).quantize(Decimal("0.01")),
+            "product_id": product_id,
         })
     return cleaned

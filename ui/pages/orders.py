@@ -8,6 +8,7 @@ from sqlalchemy import or_, select
 from config.settings import get_settings
 from database.models import Business, Order
 from database.session import get_session_factory
+from services.inventory_service import list_products
 from services.order_service import (
     STATUSES,
     OrderServiceError,
@@ -18,6 +19,19 @@ from services.order_service import (
 
 settings = get_settings()
 factory = get_session_factory(settings.database_url)
+catalogue = list_products(settings.database_url, active_only=True)
+sku_to_id = {item.sku: item.id for item in catalogue}
+product_options = ["Non-stock", *sku_to_id]
+
+
+def resolve_product_lines(frame):
+    """Translate visible SKU choices into optional catalogue product IDs."""
+    rows = frame.to_dict(orient="records")
+    for row in rows:
+        row["product_id"] = sku_to_id.get(row.pop("product_sku", "Non-stock"))
+    return rows
+
+
 st.title("Order management")
 st.caption("Create customer orders, edit drafts and track fulfilment status.")
 
@@ -33,8 +47,16 @@ with st.expander("Create an order", expanded=False):
             currency = st.text_input("Currency", value="USD", max_chars=3)
         st.caption("Line amounts and order total are calculated using decimal arithmetic.")
         lines = st.data_editor(
-            pd.DataFrame([{"description": "", "quantity": 1, "unit_price": 0.0}]),
+            pd.DataFrame([{
+                "description": "", "quantity": 1, "unit_price": 0.0,
+                "product_sku": "Non-stock",
+            }]),
             num_rows="dynamic", use_container_width=True, key="create_order_lines",
+            column_config={
+                "product_sku": st.column_config.SelectboxColumn(
+                    "Inventory product (optional)", options=product_options, required=True
+                )
+            },
         )
         submitted = st.form_submit_button("Save draft order", type="primary")
     if submitted:
@@ -42,7 +64,7 @@ with st.expander("Create an order", expanded=False):
             new_id = create_order(
                 settings.database_url, order_number=number, customer_name=customer,
                 customer_email=email, order_date=order_date, currency=currency,
-                line_items=lines.to_dict(orient="records"),
+                line_items=resolve_product_lines(lines),
             )
             st.success(f"Draft order #{new_id} saved.")
             st.rerun()
@@ -99,12 +121,19 @@ if rows:
                                 "description": line.description,
                                 "quantity": float(line.quantity),
                                 "unit_price": float(line.unit_price),
+                                "product_sku": line.product.sku if line.product else "Non-stock",
                             }
                             for line in order.line_items
                         ]
                     )
                     edit_lines = st.data_editor(
-                        frame, num_rows="dynamic", use_container_width=True
+                        frame, num_rows="dynamic", use_container_width=True,
+                        column_config={
+                            "product_sku": st.column_config.SelectboxColumn(
+                                "Inventory product (optional)", options=product_options,
+                                required=True,
+                            )
+                        },
                     )
                     edit = st.form_submit_button("Save draft changes")
                 if edit:
@@ -113,7 +142,7 @@ if rows:
                             settings.database_url, order.id,
                             customer_name=edit_customer, customer_email=edit_email,
                             currency=edit_currency,
-                            line_items=edit_lines.to_dict(orient="records"),
+                            line_items=resolve_product_lines(edit_lines),
                         )
                         st.success("Draft order updated.")
                         st.rerun()

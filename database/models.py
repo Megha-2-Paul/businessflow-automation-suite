@@ -5,6 +5,7 @@ from datetime import UTC, date, datetime
 from decimal import Decimal
 
 from sqlalchemy import (
+    Boolean,
     CheckConstraint,
     Date,
     DateTime,
@@ -45,6 +46,8 @@ class Business(Base):
     processing_jobs: Mapped[list[ProcessingJob]] = relationship(back_populates="business")
     invoices: Mapped[list[Invoice]] = relationship(back_populates="business")
     orders: Mapped[list[Order]] = relationship(back_populates="business")
+    products: Mapped[list[Product]] = relationship(back_populates="business")
+    inventory_counts: Mapped[list[InventoryCount]] = relationship(back_populates="business")
 
 
 class DatasetSource(Base):
@@ -231,6 +234,126 @@ class InvoiceLineItem(Base):
 
     invoice: Mapped[Invoice] = relationship(back_populates="line_items")
 
+class Product(Base):
+    """A sellable or trackable item in a business catalogue."""
+
+    __tablename__ = "products"
+    __table_args__ = (
+        UniqueConstraint("business_id", "sku", name="uq_product_business_sku"),
+        CheckConstraint("length(sku) > 0", name="ck_product_sku_not_empty"),
+        CheckConstraint("length(name) > 0", name="ck_product_name_not_empty"),
+        CheckConstraint("stock_on_hand >= 0", name="ck_product_stock_nonnegative"),
+        CheckConstraint("reorder_level >= 0", name="ck_product_reorder_nonnegative"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    business_id: Mapped[int] = mapped_column(
+        ForeignKey("businesses.id", ondelete="CASCADE"), nullable=False
+    )
+    sku: Mapped[str] = mapped_column(String(80), nullable=False)
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    unit: Mapped[str] = mapped_column(String(30), nullable=False, default="unit")
+    stock_on_hand: Mapped[Decimal] = mapped_column(
+        Numeric(14, 3), nullable=False, default=Decimal("0")
+    )
+    reorder_level: Mapped[Decimal] = mapped_column(
+        Numeric(14, 3), nullable=False, default=Decimal("0")
+    )
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False
+    )
+
+    business: Mapped[Business] = relationship(back_populates="products")
+    movements: Mapped[list[StockMovement]] = relationship(back_populates="product")
+    order_lines: Mapped[list[OrderLineItem]] = relationship(back_populates="product")
+
+
+class StockMovement(Base):
+    """Immutable inventory ledger entry recording a stock quantity change."""
+
+    __tablename__ = "stock_movements"
+    __table_args__ = (
+        CheckConstraint("quantity_delta != 0", name="ck_stock_movement_nonzero"),
+        CheckConstraint(
+            "movement_type IN ('opening_balance', 'receipt', 'issue', 'adjustment', "
+            "'stocktake_adjustment', 'order_fulfilment')",
+            name="ck_stock_movement_type",
+        ),
+        UniqueConstraint("order_id", "product_id", name="uq_stock_order_product"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    product_id: Mapped[int] = mapped_column(
+        ForeignKey("products.id", ondelete="RESTRICT"), nullable=False
+    )
+    order_id: Mapped[int | None] = mapped_column(
+        ForeignKey("orders.id", ondelete="RESTRICT")
+    )
+    movement_type: Mapped[str] = mapped_column(String(30), nullable=False)
+    quantity_delta: Mapped[Decimal] = mapped_column(Numeric(14, 3), nullable=False)
+    quantity_after: Mapped[Decimal] = mapped_column(Numeric(14, 3), nullable=False)
+    reference: Mapped[str | None] = mapped_column(String(120))
+    notes: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, nullable=False
+    )
+
+    product: Mapped[Product] = relationship(back_populates="movements")
+    order: Mapped[Order | None] = relationship(back_populates="stock_movements")
+
+
+class InventoryCount(Base):
+    """A physical stocktake session for one business."""
+
+    __tablename__ = "inventory_counts"
+    __table_args__ = (
+        CheckConstraint("status IN ('draft', 'reconciled')", name="ck_inventory_count_status"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    business_id: Mapped[int] = mapped_column(
+        ForeignKey("businesses.id", ondelete="CASCADE"), nullable=False
+    )
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="draft")
+    notes: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, nullable=False
+    )
+    reconciled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    business: Mapped[Business] = relationship(back_populates="inventory_counts")
+    lines: Mapped[list[InventoryCountLine]] = relationship(
+        back_populates="inventory_count", cascade="all, delete-orphan"
+    )
+
+
+class InventoryCountLine(Base):
+    """A counted quantity and recorded balance captured during a stocktake."""
+
+    __tablename__ = "inventory_count_lines"
+    __table_args__ = (
+        UniqueConstraint("inventory_count_id", "product_id", name="uq_count_product"),
+        CheckConstraint("counted_quantity >= 0", name="ck_counted_quantity_nonnegative"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    inventory_count_id: Mapped[int] = mapped_column(
+        ForeignKey("inventory_counts.id", ondelete="CASCADE"), nullable=False
+    )
+    product_id: Mapped[int] = mapped_column(
+        ForeignKey("products.id", ondelete="RESTRICT"), nullable=False
+    )
+    recorded_quantity: Mapped[Decimal] = mapped_column(Numeric(14, 3), nullable=False)
+    counted_quantity: Mapped[Decimal] = mapped_column(Numeric(14, 3), nullable=False)
+
+    inventory_count: Mapped[InventoryCount] = relationship(back_populates="lines")
+    product: Mapped[Product] = relationship()
+
+
 class Order(Base):
     """Customer order with a controlled lifecycle and calculated total."""
 
@@ -266,6 +389,7 @@ class Order(Base):
     line_items: Mapped[list[OrderLineItem]] = relationship(
         back_populates="order", cascade="all, delete-orphan"
     )
+    stock_movements: Mapped[list[StockMovement]] = relationship(back_populates="order")
 
 
 class OrderLineItem(Base):
@@ -281,5 +405,9 @@ class OrderLineItem(Base):
     quantity: Mapped[Decimal] = mapped_column(Numeric(14, 3), nullable=False)
     unit_price: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False)
     amount: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False)
+    product_id: Mapped[int | None] = mapped_column(
+        ForeignKey("products.id", ondelete="RESTRICT")
+    )
 
     order: Mapped[Order] = relationship(back_populates="line_items")
+    product: Mapped[Product | None] = relationship(back_populates="order_lines")

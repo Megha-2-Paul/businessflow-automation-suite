@@ -15,6 +15,9 @@ def build_navigation():
     orders = st.Page(
         "ui/pages/orders.py", title="Order Management", icon=":material/shopping_cart:"
     )
+    inventory = st.Page(
+        "ui/pages/inventory.py", title="Inventory Management", icon=":material/inventory_2:"
+    )
     invoices = st.Page(
         "ui/pages/invoices.py", title="Invoice Processing", icon=":material/receipt_long:"
     )
@@ -26,7 +29,7 @@ def build_navigation():
     )
     return st.navigation(
         {
-            "Workspace": [overview, data_workbench, invoices, orders, history],
+            "Workspace": [overview, data_workbench, invoices, orders, inventory, history],
             "Application": [settings],
         }
     )
