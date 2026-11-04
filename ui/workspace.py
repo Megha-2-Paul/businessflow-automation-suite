@@ -8,6 +8,7 @@ import streamlit as st
 from sqlalchemy import select
 
 from config.settings import PROJECT_ROOT
+from database.demo_data import seed_demo_dataset
 from database.models import (
     Business,
     Invoice,
@@ -18,7 +19,6 @@ from database.models import (
     Product,
     StockMovement,
 )
-from database.demo_data import seed_demo_dataset
 from database.session import get_session_factory, initialize_database
 
 DEMO_DATABASE_URL = (
