@@ -86,7 +86,7 @@ def extract_invoice_pdf(
         raise InvoiceExtractionError("The uploaded PDF is empty.")
     if len(content) > max_bytes:
         raise InvoiceExtractionError(
-            "The PDF exceeds the configured upload size limit."
+            "The PDF exceeds the configured limit for upload size."
         )
     try:
         document = pymupdf.open(stream=content, filetype="pdf")
@@ -122,7 +122,6 @@ def extract_invoice_pdf(
     )
     if value:
         draft.invoice_number = value
-
     value = _label_value(text, r"invoice\s*date|date\s*of\s*issue", _DATE)
     if value:
         draft.invoice_date = _date(value)
