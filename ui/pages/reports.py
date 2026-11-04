@@ -4,9 +4,9 @@ from datetime import date
 import streamlit as st
 
 from config.settings import get_settings
-from ui.workspace import get_database_url
 from reporting.exports import export_csv, export_xlsx
 from reporting.service import REPORT_TYPES, report_data
+from ui.workspace import get_database_url
 
 settings = get_settings()
 labels = {

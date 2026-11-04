@@ -5,9 +5,9 @@ import pandas as pd
 import streamlit as st
 
 from config.settings import get_settings
-from ui.workspace import get_database_url
 from reporting.exports import export_csv
 from reporting.service import processing_history
+from ui.workspace import get_database_url
 
 settings = get_settings()
 st.title("Processing history")

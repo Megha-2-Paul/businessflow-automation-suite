@@ -6,7 +6,6 @@ import re
 import streamlit as st
 
 from config.settings import get_settings
-from ui.workspace import get_database_url
 from processing.cleaning import clean_dataframe, consolidate_dataframes
 from processing.spreadsheets import (
     SpreadsheetError,
@@ -15,6 +14,7 @@ from processing.spreadsheets import (
     load_tabular_file,
 )
 from services.spreadsheet_service import record_processing_result
+from ui.workspace import get_database_url
 from validation.spreadsheets import validate_dataframe
 
 settings = get_settings()

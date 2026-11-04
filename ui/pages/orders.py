@@ -6,7 +6,6 @@ import streamlit as st
 from sqlalchemy import or_, select
 
 from config.settings import get_settings
-from ui.workspace import get_database_url
 from database.models import Business, Order
 from database.session import get_session_factory
 from services.inventory_service import list_products
@@ -17,6 +16,7 @@ from services.order_service import (
     create_order,
     update_order,
 )
+from ui.workspace import get_database_url
 
 settings = get_settings()
 factory = get_session_factory(get_database_url(settings.database_url))

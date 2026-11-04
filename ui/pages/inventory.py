@@ -3,7 +3,6 @@ import streamlit as st
 from sqlalchemy import select
 
 from config.settings import get_settings
-from ui.workspace import get_database_url
 from database.models import InventoryCount, InventoryCountLine
 from database.session import get_session_factory
 from services.inventory_service import (
@@ -16,6 +15,7 @@ from services.inventory_service import (
     reconcile_stocktake,
     update_product,
 )
+from ui.workspace import get_database_url
 
 settings = get_settings()
 factory = get_session_factory(get_database_url(settings.database_url))

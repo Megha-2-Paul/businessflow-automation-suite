@@ -8,11 +8,11 @@ import streamlit as st
 from sqlalchemy import select
 
 from config.settings import get_settings
-from ui.workspace import get_database_url
 from database.models import Business, Invoice
 from database.session import get_session_factory
 from invoices.extraction import InvoiceExtractionError, extract_invoice_pdf
 from services.invoice_service import InvoiceSaveError, save_reviewed_invoice
+from ui.workspace import get_database_url
 
 settings = get_settings()
 st.title("Invoice processing")
