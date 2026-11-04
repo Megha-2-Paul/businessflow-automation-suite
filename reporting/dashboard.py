@@ -54,10 +54,13 @@ def dashboard_metrics(database_url: str, period_days: int = 30) -> dict[str, Any
 
         values: dict[str, Decimal] = defaultdict(Decimal)
         previous_values: dict[str, Decimal] = defaultdict(Decimal)
+        included_statuses = {"Confirmed", "Processing", "Fulfilled"}
         for order in current_orders:
-            values[order.currency] += order.total
+            if order.status in included_statuses:
+                values[order.currency] += order.total
         for order in previous_orders:
-            previous_values[order.currency] += order.total
+            if order.status in included_statuses:
+                previous_values[order.currency] += order.total
 
         trend: dict[str, int] = defaultdict(int)
         statuses: dict[str, int] = defaultdict(int)
@@ -92,7 +95,10 @@ def dashboard_metrics(database_url: str, period_days: int = 30) -> dict[str, Any
 
         currency_rows = []
         for currency in sorted(values):
-            count = sum(order.currency == currency for order in current_orders)
+            count = sum(
+                order.currency == currency and order.status in included_statuses
+                for order in current_orders
+            )
             total = values[currency]
             previous_total = previous_values[currency]
             currency_rows.append({
