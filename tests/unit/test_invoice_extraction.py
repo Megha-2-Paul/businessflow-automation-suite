@@ -1,12 +1,12 @@
 """Unit tests for bounded PDF invoice text extraction."""
 from io import BytesIO
-import fitz
+import pymupdf
 import pytest
 from invoices.extraction import InvoiceExtractionError, extract_invoice_pdf
 
 def make_pdf(text: str) -> bytes:
     output = BytesIO()
-    document = fitz.open()
+    document = pymupdf.open()
     page = document.new_page()
     page.insert_text((50, 50), text)
     document.save(output)
@@ -19,6 +19,8 @@ def test_extracts_basic_invoice_fields():
     assert draft.supplier == "Acme Supplies"
     assert draft.invoice_number == "INV-1042"
     assert str(draft.invoice_date) == "2025-02-03"
+    assert draft.subtotal == 100
+    assert draft.tax == 18
     assert draft.total == 118
     assert draft.currency == "USD"
     assert draft.page_count == 1
@@ -35,7 +37,7 @@ def test_rejects_empty_invalid_oversized_and_scanned_pdfs():
         extract_invoice_pdf(make_pdf(" "), max_bytes=100_000)
 
 def test_rejects_page_limit():
-    document = fitz.open()
+    document = pymupdf.open()
     document.new_page()
     document.new_page()
     content = document.tobytes()

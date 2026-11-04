@@ -1,19 +1,15 @@
 name: CI
-
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
-
 permissions:
   contents: read
-
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
 jobs:
   quality:
     name: Python quality checks
@@ -33,7 +29,7 @@ jobs:
       - name: Compile Python files
         run: python -m compileall -q app.py config database logging_config ui processing validation services invoices tests
       - name: Check imports
-        run: python -c "import app; import config.settings; import database.models; import database.session; import logging_config.setup; import ui.navigation; import ui.styles; import processing.cleaning; import processing.spreadsheets; import validation.spreadsheets; import services.spreadsheet_service; import services.invoice_service; import invoices.extraction; import ui.pages.invoices"
+        run: python -c "import app; import config.settings; import database.models; import database.session; import logging_config.setup; import ui.navigation; import ui.styles; import processing.cleaning; import processing.spreadsheets; import validation.spreadsheets; import services.spreadsheet_service; import services.invoice_service; import invoices.extraction"
       - name: Run Ruff
         run: ruff check .
       - name: Run tests

@@ -4,7 +4,7 @@ import re
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
-import fitz
+import pymupdf
 
 class InvoiceExtractionError(ValueError):
     """Raised when an invoice PDF cannot be safely processed."""
@@ -64,8 +64,8 @@ def extract_invoice_pdf(content: bytes, *, max_bytes: int, max_pages: int = 100)
     if len(content) > max_bytes:
         raise InvoiceExtractionError("The PDF exceeds the configured upload size limit.")
     try:
-        document = fitz.open(stream=content, filetype="pdf")
-    except (fitz.FileDataError, ValueError) as exc:
+        document = pymupdf.open(stream=content, filetype="pdf")
+    except (pymupdf.FileDataError, ValueError) as exc:
         raise InvoiceExtractionError("The file is not a valid, readable PDF.") from exc
     with document:
         if document.needs_pass:
@@ -88,7 +88,7 @@ def extract_invoice_pdf(content: bytes, *, max_bytes: int, max_pages: int = 100)
     value = _label_value(text, r"due\s*date|payment\s*due", _DATE)
     if value:
         draft.due_date = _date(value)
-    for label, attribute in ((r"subtotal|sub-total", "subtotal"), (r"tax|vat|gst", "tax"), (r"grand\s*total|total\s*due|amount\s*due|total", "total")):
+    for label, attribute in ((r"subtotal|sub-total", "subtotal"), (r"tax|vat|gst", "tax"), (r"grand\s*total|total\s*due|amount\s*due|(?<!sub)total", "total")):
         value = _label_value(text, label, rf"({_AMOUNT})")
         if value:
             setattr(draft, attribute, _amount(value))

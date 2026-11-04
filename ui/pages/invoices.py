@@ -1,18 +1,14 @@
 """PDF invoice extraction, human review and confirmation workspace."""
 from __future__ import annotations
-
 from datetime import date
-
 import pandas as pd
 import streamlit as st
 from sqlalchemy import select
-
 from config.settings import get_settings
 from database.models import Business, Invoice
 from database.session import get_session_factory
 from invoices.extraction import InvoiceExtractionError, extract_invoice_pdf
 from services.invoice_service import InvoiceSaveError, save_reviewed_invoice
-
 settings = get_settings()
 st.title("Invoice processing")
 st.caption("Extract text from PDF invoices, review every field, then confirm what should be saved.")
@@ -32,7 +28,6 @@ if uploaded is not None and st.button("Extract invoice details", type="primary")
         st.success(f"Read selectable text from {draft.page_count} page(s). Review the extracted values below.")
     except InvoiceExtractionError as exc:
         st.error(str(exc))
-
 draft = st.session_state.get("invoice_draft")
 if draft:
     st.subheader("Review extracted details")
@@ -43,9 +38,11 @@ if draft:
         invoice_number = st.text_input("Invoice number", value=draft["invoice_number"])
         date_col, due_col, currency_col = st.columns(3)
         with date_col:
-            invoice_date = st.date_input("Invoice date", value=draft["invoice_date"] or date.today())
+            has_invoice_date = st.checkbox("Invoice date is known", value=draft["invoice_date"] is not None)
+            invoice_date = st.date_input("Invoice date", value=draft["invoice_date"] or date.today()) if has_invoice_date else None
         with due_col:
-            due_date = st.date_input("Due date", value=draft["due_date"] or date.today())
+            has_due_date = st.checkbox("Due date is known", value=draft["due_date"] is not None)
+            due_date = st.date_input("Due date", value=draft["due_date"] or date.today()) if has_due_date else None
         with currency_col:
             currency = st.text_input("Currency code", value=draft["currency"], max_chars=3)
         amount_col1, amount_col2, amount_col3 = st.columns(3)
@@ -74,7 +71,6 @@ if draft:
                 st.session_state.pop("invoice_draft", None)
             except InvoiceSaveError as exc:
                 st.error(str(exc))
-
 st.divider()
 st.subheader("Saved invoices")
 factory = get_session_factory(settings.database_url)
