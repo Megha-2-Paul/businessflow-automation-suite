@@ -9,7 +9,11 @@ reporting and processing history into one local workspace.
 
 ## Capabilities demonstrated
 
-- CSV/XLSX cleaning, validation, duplicate detection, consolidation and export.
+- CSV/XLSX cleaning, validation, duplicate detection, consolidation and export
+  using the fictional examples in `sample_data/`.
+- A populated demo workspace with products, customer orders, invoices, stock
+  movements and processing history; charts and KPIs are derived from these
+  saved records rather than hard-coded display values.
 - Selectable-text PDF invoice extraction with human review before saving.
 - Customer order creation, editing and controlled status transitions.
 - Product catalogue, stock movement ledger and physical stocktake reconciliation.
