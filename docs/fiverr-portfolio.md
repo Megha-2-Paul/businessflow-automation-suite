@@ -2,8 +2,7 @@
 
 ## Project summary
 
-BusinessFlow Automation Suite is a Python and Streamlit application demonstrating
-practical automation workflows for small-business operations. It brings
+BusinessFlow Automation Suite is a Python and Streamlit application for practical small-business operations, with decision-focused order, fulfilment and inventory insights calculated from saved workspace records. It brings
 spreadsheet processing, invoice review, order tracking, inventory control,
 reporting and processing history into one local workspace.
 
@@ -13,7 +12,7 @@ reporting and processing history into one local workspace.
 - Selectable-text PDF invoice extraction with human review before saving.
 - Customer order creation, editing and controlled status transitions.
 - Product catalogue, stock movement ledger and physical stocktake reconciliation.
-- Database-backed dashboard, downloadable reports and processing history.
+- Decision-focused dashboard with current-month order KPIs, month-over-month comparisons, six-month trends, order-status mix and inventory health.\n- Currency-aware order-value reporting; the application does not claim order value is collected revenue.\n- Database-backed reports and processing history.\n- Repeatable synthetic Demo workspace with fictional orders, invoices, stock movements and spreadsheet samples.
 - Separate fictional Demo workspace for safe product walkthroughs.
 
 ## Suggested demonstration sequence
@@ -70,7 +69,7 @@ contains seeded example records.
 
 ## Visual capture guidance
 
-Use the Business overview in Demo workspace as the primary portfolio image.
+Use the Version 3 light-and-minimal Business overview in Demo workspace as the primary portfolio image. Show the monthly KPIs and six-month charts with the fictional-data notice visible.
 Capture the running application at a desktop viewport (ideally 16:9, around
 1440 × 900 pixels) with the sidebar visible, browser zoom at 100%, and no
 developer tools, notifications or personal browser information in view. Keep
