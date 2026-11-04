@@ -199,8 +199,12 @@ def _dashboard_business_metrics(
     return {
         "orders_this_month": len(current),
         "fulfillment_rate": fulfillment_rate,
-        "current_month_order_totals": sorted(month_totals.values(), key=lambda row: row["Currency"]),
-        "monthly_order_trend": sorted(trend.values(), key=lambda row: (row["Month"], row["Currency"])),
+        "current_month_order_totals": sorted(
+            month_totals.values(), key=lambda row: row["Currency"]
+        ),
+        "monthly_order_trend": sorted(
+            trend.values(), key=lambda row: (row["Month"], row["Currency"])
+        ),
         "confirmed_vendor_payables": [
             {"Currency": key, "Amount": round(value, 2)}
             for key, value in sorted(payables.items())
