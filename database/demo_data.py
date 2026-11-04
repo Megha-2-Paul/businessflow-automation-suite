@@ -118,12 +118,16 @@ def seed_demo_records(database_url: str, *, today: date | None = None) -> None:
 
         products = []
         for sku, name, unit, price, reorder_level in PRODUCTS:
+            opening_stock = {
+                "DEMO-1005": Decimal("8"),
+                "DEMO-1006": Decimal("6"),
+            }.get(sku, Decimal("40"))
             product = Product(
                 business_id=business.id,
                 sku=sku,
                 name=name,
                 unit=unit,
-                stock_on_hand=Decimal("40"),
+                stock_on_hand=opening_stock,
                 reorder_level=Decimal(reorder_level),
             )
             session.add(product)
@@ -136,8 +140,8 @@ def seed_demo_records(database_url: str, *, today: date | None = None) -> None:
                 StockMovement(
                     product_id=product.id,
                     movement_type="opening_balance",
-                    quantity_delta=Decimal("40"),
-                    quantity_after=Decimal("40"),
+                    quantity_delta=product.stock_on_hand,
+                    quantity_after=product.stock_on_hand,
                     reference="DEMO-OPENING",
                     notes="Synthetic demonstration opening balance",
                     created_at=_at_utc(opening_date),
