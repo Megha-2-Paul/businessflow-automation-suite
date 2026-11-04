@@ -204,8 +204,8 @@ invoice = data["invoice_summary"]
 invoice_columns = st.columns(3)
 invoice_columns[0].metric("Invoices saved", invoice["total"])
 invoice_columns[1].metric("Confirmed invoices", invoice["confirmed"])
-awaiting_review = invoice["total"] - invoice["confirmed"]
-invoice_columns[2].metric("Awaiting review", awaiting_review)
+other_review_statuses = invoice["total"] - invoice["confirmed"]
+invoice_columns[2].metric("Other review statuses", other_review_statuses)
 st.caption(
     "Counts reflect saved invoice review records. Payment status and "
     "accounts-receivable balances are not tracked by this application."
