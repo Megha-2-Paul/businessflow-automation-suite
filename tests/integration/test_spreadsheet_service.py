@@ -1,6 +1,7 @@
 """Integration tests for spreadsheet processing-history persistence."""
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+
 from database.models import Business, ProcessingJob, ProcessingLog
 from database.session import get_engine
 from services.spreadsheet_service import record_processing_result
@@ -9,10 +10,17 @@ from services.spreadsheet_service import record_processing_result
 def test_record_processing_result_persists_job_and_findings(tmp_path):
     database_url = f"sqlite:///{tmp_path / 'history.db'}"
     job_id = record_processing_result(
-        database_url, job_type="spreadsheet_clean", records_processed=10,
+        database_url,
+        job_type="spreadsheet_clean",
+        records_processed=10,
         records_succeeded=8,
-        issues=[{"issue_type": "missing_values", "count": 2,
-                 "details": "Two missing values."}],
+        issues=[
+            {
+                "issue_type": "missing_values",
+                "count": 2,
+                "details": "Two missing values.",
+            }
+        ],
         message="Cleaned demonstration file.",
     )
     with Session(get_engine(database_url)) as session:
@@ -33,8 +41,12 @@ def test_record_processing_result_persists_job_and_findings(tmp_path):
 def test_record_clean_job_without_findings_is_completed(tmp_path):
     database_url = f"sqlite:///{tmp_path / 'clean.db'}"
     job_id = record_processing_result(
-        database_url, job_type="spreadsheet_clean", records_processed=3,
-        records_succeeded=3, issues=[], message="No changes needed.",
+        database_url,
+        job_type="spreadsheet_clean",
+        records_processed=3,
+        records_succeeded=3,
+        issues=[],
+        message="No changes needed.",
     )
     with Session(get_engine(database_url)) as session:
         job = session.get(ProcessingJob, job_id)
