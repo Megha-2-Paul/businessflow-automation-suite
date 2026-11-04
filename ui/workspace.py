@@ -33,7 +33,6 @@ def configure_workspace(default_url: str) -> str:
     st.session_state["bf_workspace_mode"] = mode
     if mode == "Demo":
         initialize_demo_workspace()
-        seed_demo_records(DEMO_DATABASE_URL)
         st.sidebar.info("Demonstration data · isolated from live records")
         return DEMO_DATABASE_URL
 
@@ -42,10 +41,20 @@ def configure_workspace(default_url: str) -> str:
 
 
 def initialize_demo_workspace(database_url: str = DEMO_DATABASE_URL) -> None:
-    """Create a demo business container without inserting legacy sample rows."""
+    """Create and seed the demo workspace without modifying other businesses."""
     initialize_database(database_url)
     factory = get_session_factory(database_url)
+    should_seed = False
+
     with factory.begin() as session:
-        existing_business = session.scalar(select(Business.id).limit(1))
-        if existing_business is None:
+        business = session.scalar(
+            select(Business).order_by(Business.id).limit(1)
+        )
+        if business is None:
             session.add(Business(name="Demo Business", currency="USD", timezone="UTC"))
+            should_seed = True
+        elif business.name == "Demo Business":
+            should_seed = True
+
+    if should_seed:
+        seed_demo_records(database_url)
