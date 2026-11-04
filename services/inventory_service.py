@@ -202,7 +202,7 @@ def reconcile_stocktake(database_url: str, stocktake_id: int) -> None:
                 raise InventoryServiceError("A stocktake product no longer exists.")
             if product.stock_on_hand != line.recorded_quantity:
                 raise InventoryServiceError(
-                    f"Stock for {product.sku} changed after this count began. "
+                    f"Stock for {product.sku} changed since this count began. "
                     "Create a new stocktake before reconciling."
                 )
             delta = line.counted_quantity - product.stock_on_hand

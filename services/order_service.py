@@ -9,13 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
 from database.models import (
-    Business,
-    Order,
-    OrderLineItem,
-    ProcessingJob,
-    ProcessingLog,
-    Product,
-    StockMovement,
+    Business, Order, OrderLineItem, Product, ProcessingJob, ProcessingLog, StockMovement,
 )
 from database.session import get_session_factory, initialize_database
 from orders.validation import OrderValidationError, clean_line_items
@@ -162,18 +156,12 @@ def change_order_status(database_url: str, order_id: int, new_status: str) -> No
             linked_lines = [line for line in order.line_items if line.product_id is not None]
             required: dict[int, Decimal] = {}
             for line in linked_lines:
-                required[line.product_id] = (
-                    required.get(line.product_id, Decimal("0")) + line.quantity
-                )
+                required[line.product_id] = required.get(line.product_id, Decimal("0")) + line.quantity
             for product_id, quantity in required.items():
                 product = session.scalar(
                     select(Product).where(Product.id == product_id).with_for_update()
                 )
-                if (
-                    product is None
-                    or product.business_id != order.business_id
-                    or not product.is_active
-                ):
+                if product is None or product.business_id != order.business_id or not product.is_active:
                     raise OrderServiceError("An order product is unavailable in this workspace.")
                 if product.stock_on_hand < quantity:
                     raise OrderServiceError(
