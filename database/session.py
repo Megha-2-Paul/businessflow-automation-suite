@@ -1,5 +1,6 @@
 """Database engine and session management."""
 from __future__ import annotations
+
 from collections.abc import Iterator
 from functools import lru_cache
 from pathlib import Path
