@@ -94,6 +94,16 @@ with left:
     else:
         st.info("Order values will appear after non-cancelled orders are saved.")
 
+    st.subheader("Confirmed invoice value")
+    st.caption("Confirmed invoice totals, not payment receipts or outstanding balances.")
+    if insights["invoice_totals"]:
+        st.dataframe(
+            pd.DataFrame(insights["invoice_totals"]),
+            use_container_width=True, hide_index=True,
+        )
+    else:
+        st.info("Confirmed invoice values will appear after invoices are reviewed and saved.")
+
 with right:
     st.subheader("Inventory health")
     if insights["inventory_status"]:
