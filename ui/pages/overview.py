@@ -1,6 +1,4 @@
 """Decision-focused dashboard for the selected business workspace."""
-from __future__ import annotations
-
 import pandas as pd
 import plotly.express as px
 import streamlit as st
