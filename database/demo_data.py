@@ -1,5 +1,5 @@
 """Repeatable fictional records for the isolated demonstration workspace."""
-from datetime import date, datetime, time, timedelta, UTC
+from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
 
 from sqlalchemy import select
@@ -16,7 +16,6 @@ from database.models import (
     StockMovement,
 )
 from database.session import get_session_factory, initialize_database
-
 
 CUSTOMERS = [
     ("Avery Bennett", "avery@example.invalid"),
