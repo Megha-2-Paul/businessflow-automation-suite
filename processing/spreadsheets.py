@@ -26,12 +26,12 @@ def _validate_upload(filename: str, content: bytes, max_size_bytes: int) -> str:
         raise SpreadsheetError("Only CSV and XLSX files are supported.")
     if not content:
         raise SpreadsheetError("The uploaded file is empty.")
+    if max_size_bytes <= 0:
+        raise SpreadsheetError("The configured upload limit must be positive.")
     if len(content) > max_size_bytes:
         raise SpreadsheetError(
             f"File exceeds the configured limit of {max_size_bytes // (1024 * 1024)} MB."
         )
-    if max_size_bytes <= 0:
-        raise SpreadsheetError("The configured upload limit must be positive.")
     if extension == ".xlsx":
         _validate_xlsx_archive(content)
     return extension

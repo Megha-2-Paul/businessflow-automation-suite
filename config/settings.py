@@ -5,6 +5,7 @@ import os
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
+
 from dotenv import load_dotenv
 from sqlalchemy.engine import make_url
 
@@ -30,13 +31,20 @@ class Settings:
         try:
             max_upload_mb = int(raw_limit)
         except ValueError as exc:
-            raise ValueError("BUSINESSFLOW_MAX_UPLOAD_MB must be a whole number between 1 and 500.") from exc
+            raise ValueError(
+                "BUSINESSFLOW_MAX_UPLOAD_MB must be a whole number between 1 and 500."
+            ) from exc
         if not 1 <= max_upload_mb <= 500:
             raise ValueError("BUSINESSFLOW_MAX_UPLOAD_MB must be between 1 and 500.")
         environment = os.getenv("BUSINESSFLOW_ENVIRONMENT", "development").strip().lower()
         if environment not in {"development", "testing", "production"}:
-            raise ValueError("BUSINESSFLOW_ENVIRONMENT must be development, testing, or production.")
-        database_url = os.getenv("BUSINESSFLOW_DATABASE_URL", f"sqlite:///{(PROJECT_ROOT / 'data' / 'businessflow.db').as_posix()}").strip()
+            raise ValueError(
+                "BUSINESSFLOW_ENVIRONMENT must be development, testing, or production."
+            )
+        default_database_url = f"sqlite:///{(PROJECT_ROOT / 'data' / 'businessflow.db').as_posix()}"
+        database_url = os.getenv(
+            "BUSINESSFLOW_DATABASE_URL", default_database_url
+        ).strip()
         if not database_url:
             raise ValueError("BUSINESSFLOW_DATABASE_URL must not be empty.")
         try:
@@ -44,13 +52,17 @@ class Settings:
         except (ValueError, TypeError) as exc:
             raise ValueError("BUSINESSFLOW_DATABASE_URL is not a valid SQLAlchemy URL.") from exc
         if parsed_url.drivername not in SUPPORTED_DATABASE_DRIVERS:
-            raise ValueError("BUSINESSFLOW_DATABASE_URL must use SQLite or PostgreSQL with psycopg.")
+            raise ValueError(
+                "BUSINESSFLOW_DATABASE_URL must use SQLite or PostgreSQL with psycopg."
+            )
         if parsed_url.drivername == "sqlite" and parsed_url.database in {None, ""}:
             raise ValueError("BUSINESSFLOW_DATABASE_URL must identify a SQLite database.")
         log_level = os.getenv("BUSINESSFLOW_LOG_LEVEL", "INFO").strip().upper()
         if log_level not in VALID_LOG_LEVELS:
             raise ValueError("BUSINESSFLOW_LOG_LEVEL must be a standard Python logging level.")
-        storage_dir = Path(os.getenv("BUSINESSFLOW_STORAGE_DIR", str(PROJECT_ROOT / "storage"))).expanduser()
+        storage_dir = Path(
+            os.getenv("BUSINESSFLOW_STORAGE_DIR", str(PROJECT_ROOT / "storage"))
+        ).expanduser()
         if not storage_dir.is_absolute():
             storage_dir = PROJECT_ROOT / storage_dir
         return cls(

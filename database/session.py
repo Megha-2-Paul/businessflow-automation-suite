@@ -3,9 +3,11 @@ from __future__ import annotations
 from collections.abc import Iterator
 from functools import lru_cache
 from pathlib import Path
+
 from sqlalchemy import Engine, create_engine, event, inspect, text
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session, sessionmaker
+
 from database import models  # noqa: F401 - register ORM models
 from database.base import Base
 

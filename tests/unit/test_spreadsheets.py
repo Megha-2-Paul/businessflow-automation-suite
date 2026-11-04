@@ -1,5 +1,6 @@
 """Unit tests for spreadsheet parsing, cleaning and validation."""
 from io import BytesIO
+from zipfile import ZipFile
 
 import pandas as pd
 import pytest
@@ -36,9 +37,15 @@ def test_reject_invalid_xlsx_archive_structure():
     output = BytesIO()
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
         pd.DataFrame({"item": ["Pen"]}).to_excel(writer, index=False)
-    content = output.getvalue().replace(b"xl/workbook.xml", b"xl/badbook.xml")
+    source = ZipFile(BytesIO(output.getvalue()))
+    rebuilt = BytesIO()
+    with ZipFile(rebuilt, "w") as archive:
+        for item in source.infolist():
+            if item.filename != "xl/workbook.xml":
+                archive.writestr(item, source.read(item.filename))
+    source.close()
     with pytest.raises(SpreadsheetError, match="required workbook content"):
-        load_tabular_file("bad.xlsx", content, 100_000)
+        load_tabular_file("bad.xlsx", rebuilt.getvalue(), 100_000)
 
 
 def test_reject_nonpositive_upload_limit():
