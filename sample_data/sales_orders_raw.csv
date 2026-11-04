@@ -1,0 +1,15 @@
+order_id, customer, order_date, product, quantity, unit_price, status
+S-1001, Northstar Studio ,2026-10-02,Wireless Mouse,2,24.99,Fulfilled
+S-1002,Greenfield Consulting,2026-10-04,USB-C Keyboard,1,49.99,Confirmed
+S-1003,Harbor & Co,2026-10-07,Laptop Stand,3,34.50,Processing
+S-1004, Summit Design,2026-10-09,HD Webcam,1,59.00,Draft
+S-1005,Northstar Studio,2026-10-12,USB-C Hub,2,29.95,Fulfilled
+S-1006,Oakline Retail,2026-10-14,Desk Lamp,4,22.00,Confirmed
+S-1007,Bluebird Creative,2026-10-17,Monitor Riser,1,39.00,Processing
+S-1008,Westway Services,2026-10-20,Notebook Set,5,12.50,Fulfilled
+S-1009,Maple Street Office,2026-10-22,Bluetooth Headset,1,74.00,Confirmed
+S-1010,Cedarworks,2026-10-25,Portable SSD,2,89.00,Draft
+S-1011,Pioneer Analytics,2026-10-27,Ergonomic Mouse Pad,3,15.00,Fulfilled
+S-1012,Meadowbrook Media,2026-10-29,Laptop Sleeve,2,27.50,Processing
+S-1012,Meadowbrook Media,2026-10-29,Laptop Sleeve,2,27.50,Processing
+S-1013,Greenfield Consulting,2026-10-30,USB-C Hub,,29.95,Confirmed
